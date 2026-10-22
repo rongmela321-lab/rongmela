@@ -152,55 +152,23 @@
                 @if ($revenue_profit_summary)
                     <div class="col-md-12 form-group">
                         <div class="row">
-                            <!-- Count item widget-->
-                            <!-- <div class="col-sm-3">
-                                                <div class="wrapper count-title">
-                                                    <div class="icon">
-                                                         <i class="dripicons-cart" style="color: #863636"></i>
-                                                    </div>
-                                                    <div>
-                                                        <div class="count-number total_sale-data">
-                                                            {{ number_format((float) $total_sale, $general_setting->decimal, '.', '') }}</div>
-                                                        <div class="name">
-                                                            <strong style="color: #863636">{{ __('db.Total Sale') }}
-                                                                <x-info title="Grand Total - Shipping Cost = Total Sale" type="info" />
-                                                            </strong>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div> -->
-                            <!-- Count item widget-->
-                            <div class="col-sm-3">
+                            <!-- Revenue -->
+                            <div class="col-xl-2 col-lg-4 col-md-4 col-sm-6 col-12 mb-3">
                                 <div class="wrapper count-title">
                                     <div class="icon"><i class="dripicons-graph-bar" style="color: #733686"></i></div>
                                     <div>
                                         <div class="count-number revenue-data">
                                             {{ number_format((float) $revenue, $general_setting->decimal, '.', '') }}</div>
                                         <div class="name"><strong style="color: #733686">{{ __('db.revenue') }}
-                                                <x-info title="(grand_total - shipping_cost) - Return +income  =  Revenue"
+                                                <x-info title="(grand_total - shipping_cost) - Return + income = Revenue"
                                                     type="info" />
                                             </strong></div>
                                     </div>
                                 </div>
                             </div>
 
-                            <!-- Count item widget invoice due-->
-                            <!-- <div class="col-sm-3">
-                                                <div class="wrapper count-title">
-                                                    <div class="icon">
-                                                        <i class="dripicons-document" style="color: #0584a0"></i>
-                                                    </div>
-                                                    <div>
-                                                        <div class="count-number invoice-due-data">
-                                                            {{ number_format((float) $invoice_due, $general_setting->decimal, '.', '') }}</div>
-                                                        <div class="name"><strong style="color: #0584a0">{{ __('db.Invoice Due') }}
-                                                                <x-info title="Graned Total - Paid Amount = Invoice Due" type="info" />
-                                                            </strong></div>
-                                                    </div>
-                                                </div>
-                                            </div> -->
-                            <!-- Count item widget-->
-                            <div class="col-sm-3">
+                            <!-- Sale Return -->
+                            <div class="col-xl-2 col-lg-4 col-md-4 col-sm-6 col-12 mb-3">
                                 <div class="wrapper count-title">
                                     <div class="icon"><i class="dripicons-return" style="color: #ff8952"></i></div>
                                     <div>
@@ -212,57 +180,59 @@
                                 </div>
                             </div>
 
-                            <!-- Count item widget-->
-                            <!-- <div class="col-sm-3">
-                                                <div class="wrapper count-title">
-                                                    <div class="icon"><i class="dripicons-download" aria-hidden="true" style="color:#c60031; "></i></div>
-                                                    <div>
-                                                        <div class="count-number total_purchase-data">
-                                                            {{ number_format((float) $purchase - $purchase_return, $general_setting->decimal, '.', '') }}
-                                                        </div>
-                                                        <div class="name"><strong
-                                                                style="color: #c60031">{{ __('db.Total Purchase') }}</strong></div>
-                                                    </div>
-                                                </div>
-                                            </div> -->
-
-
-                            <!-- Count item widget-->
-                            <!-- <div class="col-sm-3">
-                                                <div class="wrapper count-title">
-                                                    <div class="icon"><i class="dripicons-warning" style="color: #bdbb39"></i></div>
-                                                    <div>
-                                                        <div class="count-number purchase_due-data">
-                                                            {{ number_format((float) $purchase_due, $general_setting->decimal, '.', '') }}
-                                                        </div>
-                                                        <div class="name"><strong
-                                                                style="color: #bdbb39">{{ __('db.Purchase Due') }}</strong></div>
-                                                    </div>
-                                                </div>
-                                            </div> -->
-
-                            <!-- Count item widget-->
-                            <div class="col-sm-3">
+                            <!-- Purchase Return -->
+                            <div class="col-xl-2 col-lg-4 col-md-4 col-sm-6 col-12 mb-3">
                                 <div class="wrapper count-title">
-                                    <div class="icon"><i class="dripicons-return" style="color: #00c689"></i></div>
+                                    <div class="icon"><i class="dripicons-media-loop" style="color: #00c689"></i></div>
                                     <div>
                                         <div class="count-number purchase_return-data">
                                             {{ number_format((float) $purchase_return, $general_setting->decimal, '.', '') }}
                                         </div>
                                         <div class="name"><strong
-                                                style="color: #00c689">{{ __('db.Purchase Return') }}</strong></div>
+                                                style="color: #00c689">{{ __('db.Purchase Return') }} <x-info title="Total Purchase Return Amount" type="info" /></strong></div>
                                     </div>
                                 </div>
                             </div>
-                            <!-- Count item widget-->
-                            <div class="col-sm-3">
+
+                            <!-- Gross Profit -->
+                            <div class="col-xl-2 col-lg-4 col-md-4 col-sm-6 col-12 mb-3">
                                 <div class="wrapper count-title">
                                     <div class="icon"><i class="dripicons-trophy" style="color: #297ff9"></i></div>
                                     <div>
+                                        <div class="count-number gross_profit-data">
+                                            {{ number_format((float) $gross_profit, $general_setting->decimal, '.', '') }}</div>
+                                        <div class="name"><strong style="color: #297ff9">{{ __('db.Gross Profit') }} <x-info
+                                                    title="Revenue + Purchase Return - Product Cost (Profit before Expense)"
+                                                    type="info" /></strong>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Expense -->
+                            <div class="col-xl-2 col-lg-4 col-md-4 col-sm-6 col-12 mb-3">
+                                <div class="wrapper count-title">
+                                    <div class="icon"><i class="dripicons-wallet" style="color: #e03b3b"></i></div>
+                                    <div>
+                                        <div class="count-number expense-data">
+                                            {{ number_format((float) $expense, $general_setting->decimal, '.', '') }}</div>
+                                        <div class="name"><strong style="color: #e03b3b">{{ __('db.Expense') }} <x-info
+                                                    title="Total Operating Expense for selected date"
+                                                    type="info" /></strong>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Net Profit -->
+                            <div class="col-xl-2 col-lg-4 col-md-4 col-sm-6 col-12 mb-3">
+                                <div class="wrapper count-title">
+                                    <div class="icon"><i class="dripicons-briefcase" style="color: #28a745"></i></div>
+                                    <div>
                                         <div class="count-number profit-data">
                                             {{ number_format((float) $profit, $general_setting->decimal, '.', '') }}</div>
-                                        <div class="name"><strong style="color: #297ff9">{{ __('db.profit') }} <x-info
-                                                    title="Revenue + Purchase Return - Product Cost - Expense"
+                                        <div class="name"><strong style="color: #28a745">{{ __('db.Net Profit') }} <x-info
+                                                    title="Gross Profit - Expense = Net Profit"
                                                     type="info" /></strong>
                                         </div>
                                     </div>
@@ -900,6 +870,14 @@
             $('.purchase_return-data').hide();
             $('.purchase_return-data').html(parseFloat(data[3] ?? 0).toFixed({{ $general_setting->decimal }}));
             $('.purchase_return-data').show(500);
+
+            $('.gross_profit-data').hide();
+            $('.gross_profit-data').html(parseFloat(data[9] ?? 0).toFixed({{ $general_setting->decimal }}));
+            $('.gross_profit-data').show(500);
+
+            $('.expense-data').hide();
+            $('.expense-data').html(parseFloat(data[8] ?? 0).toFixed({{ $general_setting->decimal }}));
+            $('.expense-data').show(500);
 
             $('.profit-data').hide();
             $('.profit-data').html(parseFloat(data[2] ?? 0).toFixed({{ $general_setting->decimal }}));

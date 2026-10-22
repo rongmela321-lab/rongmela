@@ -236,7 +236,7 @@ class ExpenseController extends Controller
         $data['reference_no'] = 'er-' . date("Ymd") . '-'. date("his");
         $data['user_id'] = Auth::id();
         $data['employee_id'] = $request->employee_id ?? null;
-        $data['type'] = $request->type ?? null;
+        $data['type'] = $request->type ?? $request->expense_type ?? null;
 
         // record pos page expense in cash register
         if(isset($data['cash_register'])){

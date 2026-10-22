@@ -142,7 +142,7 @@
             $('.default').not($(this)).parent().addClass('btn-danger off');
             $('.default').not($(this)).prop('checked', false);
             $(this).prop('checked', true);
-            $.get('accounts/make-default/' + id, function(data) {
+            $.get('make-default/' + id, function(data) {
                 alert(data);
             });
         }

@@ -180,7 +180,8 @@ class HomeController extends Controller
             
             $revenue = $revenue - $return + $income;
             
-            $profit = $revenue + $purchase_return - $product_cost - $expense;
+            $gross_profit = $revenue + $purchase_return - $product_cost;
+            $profit = $gross_profit - $expense;
         }
         else
         {
@@ -225,7 +226,8 @@ class HomeController extends Controller
             
             $revenue = $revenue - $return + $income;
             
-            $profit = $revenue + $purchase_return - $product_cost - $expense;
+            $gross_profit = $revenue + $purchase_return - $product_cost;
+            $profit = $gross_profit - $expense;
         }
 
         //cash flow of last 6 months
@@ -292,7 +294,7 @@ class HomeController extends Controller
         }
         $starting_date = date("Y-m-01");
         $ending_date = date("Y-m-d");
-        return view('backend.index', compact('revenue','purchase_due','total_sale','invoice_due', 'purchase', 'expense', 'return', 'purchase_return', 'profit', 'payment_recieved', 'payment_sent', 'month', 'yearly_sale_amount', 'yearly_purchase_amount', 'versionUpgradeData', 'starting_date', 'ending_date'));
+        return view('backend.index', compact('revenue','purchase_due','total_sale','invoice_due', 'purchase', 'expense', 'return', 'purchase_return', 'gross_profit', 'profit', 'payment_recieved', 'payment_sent', 'month', 'yearly_sale_amount', 'yearly_purchase_amount', 'versionUpgradeData', 'starting_date', 'ending_date'));
     }
 
     public function newVersionReleasePage()
@@ -568,7 +570,8 @@ class HomeController extends Controller
                 ->sum('amount');
 
             $revenue = $total_sale - $return + $income;
-            $profit = $revenue + $purchase_return - $product_cost - $expense;
+            $gross_profit = $revenue + $purchase_return - $product_cost;
+            $profit = $gross_profit - $expense;
 
         } else {
             config()->set('database.connections.mysql.strict', false);
@@ -647,7 +650,8 @@ class HomeController extends Controller
                 ->sum('amount');
 
             $revenue = $total_sale - $return + $income;
-            $profit = $revenue + $purchase_return - $product_cost - $expense;
+            $gross_profit = $revenue + $purchase_return - $product_cost;
+            $profit = $gross_profit - $expense;
         }
             // ✅ return all 8 values
 
@@ -659,6 +663,8 @@ class HomeController extends Controller
         $data[5] = $invoice_due ?? 0;
         $data[6] = $purchase - $purchase_return;
         $data[7] = $purchase_due ?? 0;
+        $data[8] = $expense;
+        $data[9] = $gross_profit;
         return $data;
     }
 

@@ -638,27 +638,28 @@
               </div>
               <div class="col-md-12" id="employee-fields" style="display:none; width:100%" >
                 <div class="row">
-                        <div class="col-md-6 form-group">
-                            <label>{{ __('db.select Employee') }}</label>
-                            <select id="expense-employee" name="employee_id" class="selectpicker form-control"
-                                data-live-search="true" title="Select Employee...">
-                                @foreach(\App\Models\Employee::where('is_active', 1)->get() as $emp)
-                                    <option value="{{ $emp->id }}">{{ $emp->name }}</option>
-                                @endforeach
-                            </select>
-                        </div>
+                  <div class="col-md-6 form-group">
+                      <label>{{ __('db.select Employee') }}</label>
+                      <select id="expense-employee" name="employee_id" class="selectpicker form-control"
+                          data-live-search="true" title="Select Employee...">
+                          @foreach(\App\Models\Employee::where('is_active', 1)->get() as $emp)
+                              <option value="{{ $emp->id }}">{{ $emp->name }}</option>
+                          @endforeach
+                      </select>
+                  </div>
 
-                        <div class="col-md-6 form-group">
-                            <label>{{ __('db.Select Type') }} *</label>
-                            <select id="expense-type" name="expense_type" class="selectpicker form-control" disabled>
-                                <option value="">{{ __('db.Select Type') }}</option>
-                            </select>
-                        </div>
+                  <div class="col-md-6 form-group">
+                      <label>{{ __('db.Select Type') }} *</label>
+                      <select id="expense-type" name="type" class="selectpicker form-control" disabled>
+                          <option value="">{{ __('db.Select Type') }}</option>
+                      </select>
+                  </div>
+                </div>
+              </div>
 
-                    </div>
               <div class="col-md-6 form-group">
-                <label> {{ __('Account') }}</label>
-                <select class="form-control selectpicker" name="account_id">
+                <label> {{ __('db.Account') }} *</label>
+                <select class="form-control selectpicker" name="account_id" required>
                   @foreach($lims_account_list as $account)
                   @if($account->is_default)
                   <option selected value="{{$account->id}}">{{$account->name}} [{{$account->account_no}}]</option>
@@ -669,22 +670,18 @@
                 </select>
               </div>
 
-
-
-
-                <div class="col-md-6">
-                        <div class="form-group">
-                            <label>{{__('db.Attach Document')}}</label>
-                            <i class="dripicons-question" data-toggle="tooltip" title="Only jpg, jpeg, png, gif, pdf, csv, docx, xlsx and txt file is supported"></i>
-                            <input type="file" name="document" class="form-control" />
-                            @if($errors->has('extension'))
-                                <span>
-                                    <strong>{{ $errors->first('extension') }}</strong>
-                                </span>
-                            @endif
-                        </div>
-                    </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                    <label>{{__('db.Attach Document')}}</label>
+                    <i class="dripicons-question" data-toggle="tooltip" title="Only jpg, jpeg, png, gif, pdf, csv, docx, xlsx and txt file is supported"></i>
+                    <input type="file" name="document" class="form-control" />
+                    @if($errors->has('extension'))
+                        <span>
+                            <strong>{{ $errors->first('extension') }}</strong>
+                        </span>
+                    @endif
                 </div>
+              </div>
 
             </div>
 
@@ -1432,7 +1429,7 @@
             $("#expense-type").prop("disabled", false);
 
             let options = `
-                <option value="expense_load">Expense</option>
+                <option value="expense">Expense</option>
                 <option value="advance">Advance</option>
             `;
             $("#expense-type").html(options).selectpicker('refresh');
