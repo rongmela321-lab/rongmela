@@ -156,6 +156,17 @@
                 </li>
             @endcan
 
+            @can('sidebar_tailor')
+                <li>
+                    <a href="#tailor" aria-expanded="false" data-toggle="collapse"> <i class="fa fa-scissors"></i><span>{{__('db.Tailor') ?? 'Tailor'}}</span></a>
+                    <ul id="tailor" class="collapse list-unstyled ">
+                        <li id="tailor-list-menu"><a href="{{route('tailors.index')}}">{{__('db.Tailor List') ?? 'Tailor List'}}</a></li>
+                        <li id="tailor-delivery-menu"><a href="{{route('tailor_deliveries.index')}}">{{__('db.Delivery List') ?? 'Delivery List'}}</a></li>
+                        <li id="tailor-monthly-menu"><a href="{{route('tailor_monthly_payments.index')}}">{{__('db.Monthly Payment List') ?? 'Monthly Payment List'}}</a></li>
+                    </ul>
+                </li>
+            @endcan
+
             @can('sidebar_people')
                 <li>
                     <a href="#people" aria-expanded="false" data-toggle="collapse"> <i class="dripicons-user"></i><span>{{__('db.People')}}</span></a>

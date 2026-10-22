@@ -81,6 +81,9 @@ use App\Http\Controllers\OvertimeController;
 use App\Http\Controllers\SaleAgentController;
 use App\Http\Controllers\ShiftController;
 use App\Http\Controllers\WhatsappController;
+use App\Http\Controllers\TailorController;
+use App\Http\Controllers\TailorDeliveryController;
+use App\Http\Controllers\TailorMonthlyPaymentController;
 
 Route::get('webview/auth', function (Request $request) {
     // Get token from Authorization header
@@ -705,6 +708,21 @@ Route::group(['middleware' => ['common', 'auth', 'active']], function () {
     });
     Route::resource('incomes', IncomeController::class);
     // IncomeCategory & Income End
+
+    // Tailor Module Routes Start
+    Route::get('tailors/percentage-tailors', [TailorController::class, 'getPercentageTailors'])->name('tailors.percentage');
+    Route::get('tailors/monthly-tailors', [TailorController::class, 'getMonthlyTailors'])->name('tailors.monthly');
+    Route::post('tailors/deletebyselection', [TailorController::class, 'deleteBySelection'])->name('tailors.deletebyselection');
+    Route::resource('tailors', TailorController::class);
+
+    Route::post('tailor_deliveries/deletebyselection', [TailorDeliveryController::class, 'deleteBySelection'])->name('tailor_deliveries.deletebyselection');
+    Route::post('tailor_deliveries/{id}/add-payment', [TailorDeliveryController::class, 'addPayment'])->name('tailor_deliveries.add_payment');
+    Route::get('tailor_deliveries/{id}/payments', [TailorDeliveryController::class, 'getPayments'])->name('tailor_deliveries.get_payments');
+    Route::resource('tailor_deliveries', TailorDeliveryController::class);
+
+    Route::post('tailor_monthly_payments/deletebyselection', [TailorMonthlyPaymentController::class, 'deleteBySelection'])->name('tailor_monthly_payments.deletebyselection');
+    Route::resource('tailor_monthly_payments', TailorMonthlyPaymentController::class);
+    // Tailor Module Routes End
 
 
     Route::controller(GiftCardController::class)->group(function () {
