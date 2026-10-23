@@ -19,7 +19,7 @@
     <div class="container-fluid">
         <!-- Top Stats Cards -->
         <div class="row mb-3">
-            <div class="col-md-4 col-sm-6 mb-2">
+            <div class="col-xl-3 col-sm-6 mb-2">
                 <div class="wrapper count-title d-flex align-items-center">
                     <div class="icon"><i class="fa fa-users" style="color: #733686; font-size: 28px;"></i></div>
                     <div class="ml-3">
@@ -28,7 +28,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-4 col-sm-6 mb-2">
+            <div class="col-xl-3 col-sm-6 mb-2">
                 <div class="wrapper count-title d-flex align-items-center">
                     <div class="icon"><i class="fa fa-percent" style="color: #297ff9; font-size: 28px;"></i></div>
                     <div class="ml-3">
@@ -37,14 +37,68 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-4 col-sm-6 mb-2">
+            <div class="col-xl-3 col-sm-6 mb-2">
                 <div class="wrapper count-title d-flex align-items-center">
-                    <div class="icon"><i class="fa fa-calendar-check-o" style="color: #00c689; font-size: 28px;"></i></div>
+                    <div class="icon"><i class="fa fa-calendar-check-o" style="color: #17a2b8; font-size: 28px;"></i></div>
                     <div class="ml-3">
                         <div class="count-number">{{ $monthly_count }}</div>
-                        <div class="name"><strong style="color: #00c689">{{ __('db.Monthly Tailors') }}</strong></div>
+                        <div class="name"><strong style="color: #17a2b8">{{ __('db.Monthly Tailors') }}</strong></div>
                     </div>
                 </div>
+            </div>
+            <div class="col-xl-3 col-sm-6 mb-2">
+                <div class="wrapper count-title d-flex align-items-center">
+                    <div class="icon"><i class="fa fa-money" style="color: #00c689; font-size: 28px;"></i></div>
+                    <div class="ml-3">
+                        <div class="count-number text-success font-weight-bold">{{ number_format($total_period_collection, 2) }}</div>
+                        <div class="name"><strong style="color: #00c689">{{ __('db.Period Collection') }}</strong></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filter Card -->
+        <div class="card mb-3">
+            <div class="card-header bg-white">
+                <h4 class="mb-0 font-weight-bold"><i class="fa fa-filter"></i> {{ __('db.Filter') }}</h4>
+            </div>
+            <div class="card-body">
+                {!! Form::open(['route' => 'tailors.index', 'method' => 'get', 'id' => 'tailor-filter-form']) !!}
+                <div class="row align-items-end">
+                    <!-- Work Type Filter -->
+                    <div class="col-md-3 col-sm-6 form-group">
+                        <label><strong>{{ __('db.Work Type') }}</strong></label>
+                        <select name="type" class="form-control selectpicker">
+                            <option value="all" {{ $type == 'all' ? 'selected' : '' }}>{{ __('db.All') }}</option>
+                            <option value="percentage" {{ $type == 'percentage' ? 'selected' : '' }}>{{ __('db.Percentage Basis') }}</option>
+                            <option value="monthly" {{ $type == 'monthly' ? 'selected' : '' }}>{{ __('db.Monthly Basis') }}</option>
+                        </select>
+                    </div>
+
+                    <!-- Date Range Picker -->
+                    <div class="col-md-5 col-sm-6 form-group">
+                        <label><strong>{{ __('db.Date Range') }}</strong></label>
+                        <div class="input-group">
+                            <input type="text" class="daterangepicker-field form-control" value="{{ $starting_date }} To {{ $ending_date }}" required />
+                            <input type="hidden" name="starting_date" value="{{ $starting_date }}" />
+                            <input type="hidden" name="ending_date" value="{{ $ending_date }}" />
+                            <div class="input-group-append">
+                                <span class="input-group-text"><i class="dripicons-calendar"></i></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Filter Button -->
+                    <div class="col-md-2 col-sm-6 form-group">
+                        <button type="submit" class="btn btn-primary btn-block"><i class="fa fa-search"></i> {{ __('db.Filter') }}</button>
+                    </div>
+
+                    <!-- Reset Button -->
+                    <div class="col-md-2 col-sm-6 form-group">
+                        <a href="{{ route('tailors.index') }}" class="btn btn-outline-secondary btn-block"><i class="fa fa-undo"></i> {{ __('db.Reset') }}</a>
+                    </div>
+                </div>
+                {!! Form::close() !!}
             </div>
         </div>
 
@@ -54,9 +108,9 @@
                 <div class="d-flex align-items-center flex-wrap">
                     <!-- Filter by Type -->
                     <div class="btn-group mr-2 mb-2" role="group">
-                        <a href="{{ route('tailors.index', ['type' => 'all']) }}" class="btn btn-sm {{ $type == 'all' ? 'btn-primary' : 'btn-outline-primary' }}">{{ __('db.All') }}</a>
-                        <a href="{{ route('tailors.index', ['type' => 'percentage']) }}" class="btn btn-sm {{ $type == 'percentage' ? 'btn-primary' : 'btn-outline-primary' }}">{{ __('db.Percentage Basis') }}</a>
-                        <a href="{{ route('tailors.index', ['type' => 'monthly']) }}" class="btn btn-sm {{ $type == 'monthly' ? 'btn-primary' : 'btn-outline-primary' }}">{{ __('db.Monthly Basis') }}</a>
+                        <a href="{{ route('tailors.index', ['type' => 'all', 'starting_date' => $starting_date, 'ending_date' => $ending_date]) }}" class="btn btn-sm {{ $type == 'all' ? 'btn-primary' : 'btn-outline-primary' }}">{{ __('db.All') }}</a>
+                        <a href="{{ route('tailors.index', ['type' => 'percentage', 'starting_date' => $starting_date, 'ending_date' => $ending_date]) }}" class="btn btn-sm {{ $type == 'percentage' ? 'btn-primary' : 'btn-outline-primary' }}">{{ __('db.Percentage Basis') }}</a>
+                        <a href="{{ route('tailors.index', ['type' => 'monthly', 'starting_date' => $starting_date, 'ending_date' => $ending_date]) }}" class="btn btn-sm {{ $type == 'monthly' ? 'btn-primary' : 'btn-outline-primary' }}">{{ __('db.Monthly Basis') }}</a>
                     </div>
                     <button class="btn btn-info btn-sm mb-2" data-toggle="modal" data-target="#add-tailor-modal">
                         <i class="dripicons-plus"></i> {{ __('db.Add Tailor') }}
@@ -102,25 +156,46 @@
                                 </td>
                                 <td>
                                     @if($tailor->type == 'percentage')
-                                        <a href="{{ route('tailor_deliveries.index', ['tailor_id' => $tailor->id]) }}" class="badge badge-info p-2">
-                                            {{ $tailor->deliveries_count }} {{ __('db.Deliveries') }}
+                                        <a href="{{ route('tailor_deliveries.index', ['tailor_id' => $tailor->id, 'starting_date' => $starting_date, 'ending_date' => $ending_date]) }}" class="badge badge-info p-2" title="{{ __('db.View Deliveries in this period') }}">
+                                            {{ $tailor->period_deliveries_count ?? 0 }} {{ __('db.Deliveries') }}
                                         </a>
                                     @else
-                                        <a href="{{ route('tailor_monthly_payments.index', ['tailor_id' => $tailor->id]) }}" class="badge badge-info p-2">
-                                            {{ $tailor->monthly_payments_count }} {{ __('db.Payments') }}
+                                        <a href="{{ route('tailor_monthly_payments.index', ['tailor_id' => $tailor->id, 'starting_date' => $starting_date, 'ending_date' => $ending_date]) }}" class="badge badge-info p-2" title="{{ __('db.View Payments in this period') }}">
+                                            {{ $tailor->period_monthly_payments_count ?? 0 }} {{ __('db.Payments') }}
                                         </a>
                                     @endif
                                 </td>
                                 <td class="text-success font-weight-bold">
                                     @if($tailor->type == 'percentage')
-                                        {{ number_format((float)($tailor->total_delivery_paid ?? 0), 2) }}
+                                        @php
+                                            $paid = (float)($tailor->period_delivery_paid ?? 0);
+                                            $allPaid = (float)($tailor->all_delivery_paid ?? 0);
+                                        @endphp
+                                        <span>{{ number_format($paid, 2) }}</span>
+                                        @if($paid != $allPaid)
+                                            <br><small class="text-muted font-weight-normal">{{ __('db.All Time') }}: {{ number_format($allPaid, 2) }}</small>
+                                        @endif
                                     @else
-                                        {{ number_format((float)($tailor->total_monthly_paid ?? 0), 2) }}
+                                        @php
+                                            $paid = (float)($tailor->period_monthly_paid ?? 0);
+                                            $allPaid = (float)($tailor->all_monthly_paid ?? 0);
+                                        @endphp
+                                        <span>{{ number_format($paid, 2) }}</span>
+                                        @if($paid != $allPaid)
+                                            <br><small class="text-muted font-weight-normal">{{ __('db.All Time') }}: {{ number_format($allPaid, 2) }}</small>
+                                        @endif
                                     @endif
                                 </td>
                                 <td class="text-danger font-weight-bold">
                                     @if($tailor->type == 'percentage')
-                                        {{ number_format((float)($tailor->total_delivery_due ?? 0), 2) }}
+                                        @php
+                                            $due = (float)($tailor->period_delivery_due ?? 0);
+                                            $allDue = (float)($tailor->all_delivery_due ?? 0);
+                                        @endphp
+                                        <span>{{ number_format($due, 2) }}</span>
+                                        @if($due != $allDue)
+                                            <br><small class="text-muted font-weight-normal">{{ __('db.All Time') }}: {{ number_format($allDue, 2) }}</small>
+                                        @endif
                                     @else
                                         -
                                     @endif
@@ -181,6 +256,15 @@
                             </tr>
                             @endforeach
                         </tbody>
+                        <tfoot class="tfoot font-weight-bold bg-light">
+                            <tr>
+                                <th colspan="5" class="text-right">{{ __('db.Total') }}:</th>
+                                <th>{{ $total_period_deliveries + $total_period_payments }}</th>
+                                <th class="text-success">{{ number_format($total_period_collection, 2) }}</th>
+                                <th class="text-danger">{{ number_format($total_period_due, 2) }}</th>
+                                <th colspan="2"></th>
+                            </tr>
+                        </tfoot>
                     </table>
                 </div>
             </div>
@@ -329,6 +413,26 @@
     }
 
     $(document).ready(function() {
+        // Initialize DateRangePicker (identical to Deliveries and Monthly Payments)
+        $(".daterangepicker-field").daterangepicker({
+            ranges: {
+                'Today': [moment(), moment()],
+                'Yesterday': [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+                'Last 7 Days': [moment().subtract(6, 'days'), moment()],
+                'Last 30 Days': [moment().subtract(29, 'days'), moment()],
+                'This Month': [moment().startOf('month'), moment().endOf('month')],
+                'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')],
+                'This Year': [moment().startOf('year'), moment().endOf('year')],
+                'All Time': [moment('2020-01-01'), moment()]
+            }
+        }, function(start, end, label) {
+            let sDate = start.format('YYYY-MM-DD');
+            let eDate = end.format('YYYY-MM-DD');
+            $('input[name="starting_date"]').val(sDate);
+            $('input[name="ending_date"]').val(eDate);
+            $('.daterangepicker-field').val(sDate + ' To ' + eDate);
+        });
+
         // Toggle add modal type fields
         $('#add-tailor-type').on('change', function() {
             var type = $(this).val();

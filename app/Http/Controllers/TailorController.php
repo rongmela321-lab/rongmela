@@ -13,14 +13,10 @@ class TailorController extends Controller
     public function index(Request $request)
     {
         $type = $request->get('type', 'all');
+        $starting_date = $request->get('starting_date', date('Y-m-01'));
+        $ending_date = $request->get('ending_date', date('Y-m-d'));
 
-        $query = Tailor::withCount(['deliveries', 'monthlyPayments'])
-            ->withSum('deliveries as total_delivery_amount', 'delivery_amount')
-            ->withSum('deliveries as total_owner_get', 'owner_get')
-            ->withSum('deliveries as total_delivery_paid', 'paid_amount')
-            ->withSum('deliveries as total_delivery_due', 'due_amount')
-            ->withSum('monthlyPayments as total_monthly_paid', 'amount')
-            ->orderBy('id', 'desc');
+        $query = Tailor::query();
 
         if ($type === 'percentage') {
             $query->where('type', 'percentage');
@@ -28,18 +24,81 @@ class TailorController extends Controller
             $query->where('type', 'monthly');
         }
 
+        $query->withCount([
+            'deliveries as period_deliveries_count' => function ($q) use ($starting_date, $ending_date) {
+                $q->whereDate('delivery_date', '>=', $starting_date)
+                  ->whereDate('delivery_date', '<=', $ending_date);
+            },
+            'monthlyPayments as period_monthly_payments_count' => function ($q) use ($starting_date, $ending_date) {
+                $q->whereDate('payment_date', '>=', $starting_date)
+                  ->whereDate('payment_date', '<=', $ending_date);
+            },
+            'deliveries as all_deliveries_count',
+            'monthlyPayments as all_monthly_payments_count',
+        ])
+        ->withSum([
+            'deliveries as period_delivery_paid' => function ($q) use ($starting_date, $ending_date) {
+                $q->whereDate('delivery_date', '>=', $starting_date)
+                  ->whereDate('delivery_date', '<=', $ending_date);
+            }
+        ], 'paid_amount')
+        ->withSum([
+            'deliveries as period_delivery_due' => function ($q) use ($starting_date, $ending_date) {
+                $q->whereDate('delivery_date', '>=', $starting_date)
+                  ->whereDate('delivery_date', '<=', $ending_date);
+            }
+        ], 'due_amount')
+        ->withSum([
+            'deliveries as period_delivery_amount' => function ($q) use ($starting_date, $ending_date) {
+                $q->whereDate('delivery_date', '>=', $starting_date)
+                  ->whereDate('delivery_date', '<=', $ending_date);
+            }
+        ], 'delivery_amount')
+        ->withSum([
+            'deliveries as period_owner_get' => function ($q) use ($starting_date, $ending_date) {
+                $q->whereDate('delivery_date', '>=', $starting_date)
+                  ->whereDate('delivery_date', '<=', $ending_date);
+            }
+        ], 'owner_get')
+        ->withSum([
+            'monthlyPayments as period_monthly_paid' => function ($q) use ($starting_date, $ending_date) {
+                $q->whereDate('payment_date', '>=', $starting_date)
+                  ->whereDate('payment_date', '<=', $ending_date);
+            }
+        ], 'amount')
+        ->withSum('deliveries as all_delivery_paid', 'paid_amount')
+        ->withSum('deliveries as all_delivery_due', 'due_amount')
+        ->withSum('monthlyPayments as all_monthly_paid', 'amount')
+        ->orderBy('id', 'desc');
+
         $tailors = $query->get();
 
         $total_count = Tailor::count();
         $percentage_count = Tailor::where('type', 'percentage')->count();
         $monthly_count = Tailor::where('type', 'monthly')->count();
 
+        // Summary calculations for the filtered period
+        $total_period_deliveries = (int)$tailors->where('type', 'percentage')->sum('period_deliveries_count');
+        $total_period_payments = (int)$tailors->where('type', 'monthly')->sum('period_monthly_payments_count');
+
+        $total_period_delivery_paid = (float)$tailors->where('type', 'percentage')->sum('period_delivery_paid');
+        $total_period_monthly_paid = (float)$tailors->where('type', 'monthly')->sum('period_monthly_paid');
+        $total_period_collection = $total_period_delivery_paid + $total_period_monthly_paid;
+
+        $total_period_due = (float)$tailors->where('type', 'percentage')->sum('period_delivery_due');
+
         return view('backend.tailor.index', compact(
             'tailors',
             'type',
+            'starting_date',
+            'ending_date',
             'total_count',
             'percentage_count',
-            'monthly_count'
+            'monthly_count',
+            'total_period_deliveries',
+            'total_period_payments',
+            'total_period_collection',
+            'total_period_due'
         ));
     }
 
