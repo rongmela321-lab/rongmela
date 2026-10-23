@@ -24,7 +24,7 @@
                     <div class="icon"><i class="fa fa-shopping-bag" style="color: #733686; font-size: 26px;"></i></div>
                     <div class="ml-3">
                         <div class="count-number">{{ number_format($total_delivery_amount, 2) }}</div>
-                        <div class="name"><strong style="color: #733686">{{ __('db.Total Delivery Amount') ?? 'Total Delivery Bill' }}</strong></div>
+                        <div class="name"><strong style="color: #733686">{{ __('db.Total Delivery Amount') }}</strong></div>
                     </div>
                 </div>
             </div>
@@ -33,7 +33,7 @@
                     <div class="icon"><i class="fa fa-hand-holding-usd" style="color: #297ff9; font-size: 26px;"></i></div>
                     <div class="ml-3">
                         <div class="count-number">{{ number_format($total_owner_get, 2) }}</div>
-                        <div class="name"><strong style="color: #297ff9">{{ __('db.Total Owner Share') ?? 'Total Owner Get (মালিকের প্রাপ্য)' }}</strong></div>
+                        <div class="name"><strong style="color: #297ff9">{{ __('db.Total Owner Share') }}</strong></div>
                     </div>
                 </div>
             </div>
@@ -42,7 +42,7 @@
                     <div class="icon"><i class="fa fa-check-circle" style="color: #00c689; font-size: 26px;"></i></div>
                     <div class="ml-3">
                         <div class="count-number">{{ number_format($total_paid_amount, 2) }}</div>
-                        <div class="name"><strong style="color: #00c689">{{ __('db.Total Collected') ?? 'Total Collected (আদায়)' }}</strong></div>
+                        <div class="name"><strong style="color: #00c689">{{ __('db.Total Collected') }}</strong></div>
                     </div>
                 </div>
             </div>
@@ -51,7 +51,7 @@
                     <div class="icon"><i class="fa fa-exclamation-triangle" style="color: #e03b3b; font-size: 26px;"></i></div>
                     <div class="ml-3">
                         <div class="count-number">{{ number_format($total_due_amount, 2) }}</div>
-                        <div class="name"><strong style="color: #e03b3b">{{ __('db.Total Due') ?? 'Total Due (মোট বাকি)' }}</strong></div>
+                        <div class="name"><strong style="color: #e03b3b">{{ __('db.Total Due') }}</strong></div>
                     </div>
                 </div>
             </div>
@@ -60,16 +60,16 @@
         <!-- Filter Card -->
         <div class="card mb-3">
             <div class="card-header bg-white">
-                <h4 class="mb-0 font-weight-bold"><i class="fa fa-filter"></i> {{ __('db.Filter Deliveries') ?? 'Filter Deliveries' }}</h4>
+                <h4 class="mb-0 font-weight-bold"><i class="fa fa-filter"></i> {{ __('db.Filter Deliveries') }}</h4>
             </div>
             <div class="card-body">
                 {!! Form::open(['route' => 'tailor_deliveries.index', 'method' => 'get', 'id' => 'delivery-filter-form']) !!}
                 <div class="row align-items-end">
                     <!-- Tailor Filter -->
                     <div class="col-md-3 col-sm-6 form-group">
-                        <label><strong>{{ __('db.Select Tailor') ?? 'Select Tailor' }}</strong></label>
+                        <label><strong>{{ __('db.Select Tailor') }}</strong></label>
                         <select name="tailor_id" class="form-control selectpicker" data-live-search="true">
-                            <option value="0">{{ __('db.All Percentage Tailors') ?? 'All Percentage Tailors' }}</option>
+                            <option value="0">{{ __('db.All Percentage Tailors') }}</option>
                             @foreach($percentage_tailors as $t)
                                 <option value="{{ $t->id }}" {{ $tailor_id == $t->id ? 'selected' : '' }}>
                                     {{ $t->name }} ({{ number_format($t->percentage, 2) }}%)
@@ -80,7 +80,7 @@
 
                     <!-- Date Range Picker (like Dashboard) -->
                     <div class="col-md-4 col-sm-6 form-group">
-                        <label><strong>{{ __('db.Date Range') ?? 'Date Range' }}</strong></label>
+                        <label><strong>{{ __('db.Date Range') }}</strong></label>
                         <div class="input-group">
                             <input type="text" class="daterangepicker-field form-control" value="{{ $starting_date }} To {{ $ending_date }}" required />
                             <input type="hidden" name="starting_date" value="{{ $starting_date }}" />
@@ -93,18 +93,18 @@
 
                     <!-- Payment Status Filter -->
                     <div class="col-md-3 col-sm-6 form-group">
-                        <label><strong>{{ __('db.Payment Status') ?? 'Payment Status' }}</strong></label>
+                        <label><strong>{{ __('db.Payment Status') }}</strong></label>
                         <select name="payment_status" class="form-control selectpicker">
-                            <option value="all" {{ $payment_status == 'all' ? 'selected' : '' }}>{{ __('db.All Status') ?? 'All Status' }}</option>
-                            <option value="paid" {{ $payment_status == 'paid' ? 'selected' : '' }}>{{ __('db.Paid') ?? 'Paid (পরিশোধিত)' }}</option>
-                            <option value="partial" {{ $payment_status == 'partial' ? 'selected' : '' }}>{{ __('db.Partial') ?? 'Partial (আংশিক পরিশোধ)' }}</option>
-                            <option value="due" {{ $payment_status == 'due' ? 'selected' : '' }}>{{ __('db.Due') ?? 'Due (সম্পূর্ণ বাকি)' }}</option>
+                            <option value="all" {{ $payment_status == 'all' ? 'selected' : '' }}>{{ __('db.All Status') }}</option>
+                            <option value="paid" {{ $payment_status == 'paid' ? 'selected' : '' }}>{{ __('db.Paid') }}</option>
+                            <option value="partial" {{ $payment_status == 'partial' ? 'selected' : '' }}>{{ __('db.Partial') }}</option>
+                            <option value="due" {{ $payment_status == 'due' ? 'selected' : '' }}>{{ __('db.Due') }}</option>
                         </select>
                     </div>
 
                     <!-- Submit & Reset -->
                     <div class="col-md-2 col-sm-6 form-group">
-                        <button type="submit" class="btn btn-primary btn-block"><i class="fa fa-search"></i> {{ __('db.Filter') ?? 'Filter' }}</button>
+                        <button type="submit" class="btn btn-primary btn-block"><i class="fa fa-search"></i> {{ __('db.Filter') }}</button>
                     </div>
                 </div>
                 {!! Form::close() !!}
@@ -114,9 +114,9 @@
         <!-- Deliveries Table Card -->
         <div class="card">
             <div class="card-header d-flex justify-content-between align-items-center flex-wrap">
-                <h3 class="font-weight-bold mb-2"><i class="fa fa-truck"></i> {{ __('db.Delivery List') ?? 'Tailor Delivery List' }}</h3>
+                <h3 class="font-weight-bold mb-2"><i class="fa fa-truck"></i> {{ __('db.Delivery List') }}</h3>
                 <button class="btn btn-info btn-sm mb-2" data-toggle="modal" data-target="#add-delivery-modal">
-                    <i class="dripicons-plus"></i> {{ __('db.Add Delivery') ?? 'Add Delivery' }}
+                    <i class="dripicons-plus"></i> {{ __('db.Add Delivery') }}
                 </button>
             </div>
             <div class="card-body">
@@ -125,17 +125,17 @@
                         <thead>
                             <tr>
                                 <th class="not-exported"></th>
-                                <th>{{ __('db.date') ?? 'Date' }}</th>
-                                <th>{{ __('db.reference') ?? 'Reference' }}</th>
-                                <th>{{ __('db.Tailor') ?? 'Tailor Name' }}</th>
-                                <th>{{ __('db.Delivery Amount') ?? 'Delivery Amount' }}</th>
-                                <th>{{ __('db.Percentage') ?? 'Share %' }}</th>
-                                <th>{{ __('db.Owner Get') ?? 'Owner Get' }}</th>
-                                <th>{{ __('db.Paid Amount') ?? 'Paid' }}</th>
-                                <th>{{ __('db.Due Amount') ?? 'Due' }}</th>
-                                <th>{{ __('db.Status') ?? 'Status' }}</th>
-                                <th>{{ __('db.Note') ?? 'Note' }}</th>
-                                <th class="not-exported">{{ __('db.action') ?? 'Action' }}</th>
+                                <th>{{ __('db.date') }}</th>
+                                <th>{{ __('db.reference') }}</th>
+                                <th>{{ __('db.Tailor') }}</th>
+                                <th>{{ __('db.Delivery Amount') }}</th>
+                                <th>{{ __('db.Percentage') }}</th>
+                                <th>{{ __('db.Owner Get') }}</th>
+                                <th>{{ __('db.Paid Amount') }}</th>
+                                <th>{{ __('db.Due Amount') }}</th>
+                                <th>{{ __('db.Status') }}</th>
+                                <th>{{ __('db.Note') }}</th>
+                                <th class="not-exported">{{ __('db.action') }}</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -158,18 +158,18 @@
                                 </td>
                                 <td>
                                     @if($delivery->payment_status === 'paid')
-                                        <span class="badge badge-success p-1"><i class="fa fa-check"></i> {{ __('db.Paid') ?? 'Paid' }}</span>
+                                        <span class="badge badge-success p-1"><i class="fa fa-check"></i> {{ __('db.Paid') }}</span>
                                     @elseif($delivery->payment_status === 'partial')
-                                        <span class="badge badge-warning p-1 text-dark"><i class="fa fa-clock-o"></i> {{ __('db.Partial') ?? 'Partial' }}</span>
+                                        <span class="badge badge-warning p-1 text-dark"><i class="fa fa-clock-o"></i> {{ __('db.Partial') }}</span>
                                     @else
-                                        <span class="badge badge-danger p-1"><i class="fa fa-times-circle"></i> {{ __('db.Due') ?? 'Due' }}</span>
+                                        <span class="badge badge-danger p-1"><i class="fa fa-times-circle"></i> {{ __('db.Due') }}</span>
                                     @endif
                                 </td>
                                 <td><small class="text-muted">{{ $delivery->note ?? '-' }}</small></td>
                                 <td>
                                     <div class="btn-group">
                                         <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                            {{ __('db.action') ?? 'Action' }}
+                                            {{ __('db.action') }}
                                             <span class="caret"></span>
                                         </button>
                                         <ul class="dropdown-menu edit-options dropdown-menu-right dropdown-default" user="menu">
@@ -185,7 +185,7 @@
                                                     data-due="{{ $delivery->due_amount }}"
                                                     data-toggle="modal" 
                                                     data-target="#add-payment-modal">
-                                                    <i class="fa fa-plus-circle text-success"></i> {{ __('db.Add Payment') ?? 'Add Payment (বাকি পরিশোধ)' }}
+                                                    <i class="fa fa-plus-circle text-success"></i> {{ __('db.Add Payment') }}
                                                 </button>
                                             </li>
                                             @endif
@@ -196,7 +196,7 @@
                                                     data-ref="{{ $delivery->reference_no }}"
                                                     data-toggle="modal" 
                                                     data-target="#view-payments-modal">
-                                                    <i class="dripicons-document"></i> {{ __('db.Payment History') ?? 'Payment History' }}
+                                                    <i class="dripicons-document"></i> {{ __('db.Payment History') }}
                                                 </button>
                                             </li>
                                             <li>
@@ -213,13 +213,13 @@
                                                     data-note="{{ $delivery->note }}"
                                                     data-toggle="modal" 
                                                     data-target="#edit-delivery-modal">
-                                                    <i class="dripicons-document-edit"></i> {{ __('db.edit') ?? 'Edit' }}
+                                                    <i class="dripicons-document-edit"></i> {{ __('db.edit') }}
                                                 </button>
                                             </li>
                                             <li>
                                                 {!! Form::open(['route' => ['tailor_deliveries.destroy', $delivery->id], 'method' => 'DELETE', 'onsubmit' => 'return confirmDelete()']) !!}
                                                 <button type="submit" class="btn btn-link text-danger">
-                                                    <i class="dripicons-trash"></i> {{ __('db.delete') ?? 'Delete' }}
+                                                    <i class="dripicons-trash"></i> {{ __('db.delete') }}
                                                 </button>
                                                 {!! Form::close() !!}
                                             </li>
@@ -231,7 +231,7 @@
                         </tbody>
                         <tfoot class="tfoot font-weight-bold bg-light">
                             <tr>
-                                <th colspan="4" class="text-right">{{ __('db.Total') ?? 'Total' }}:</th>
+                                <th colspan="4" class="text-right">{{ __('db.Total') }}:</th>
                                 <th class="text-dark">{{ number_format($total_delivery_amount, 2) }}</th>
                                 <th></th>
                                 <th class="text-primary">{{ number_format($total_owner_get, 2) }}</th>
@@ -253,15 +253,15 @@
         <div class="modal-content">
             {!! Form::open(['route' => 'tailor_deliveries.store', 'method' => 'post', 'id' => 'add-delivery-form']) !!}
             <div class="modal-header">
-                <h5 class="modal-title font-weight-bold"><i class="fa fa-truck"></i> {{ __('db.Add Delivery') ?? 'Add Tailor Delivery' }}</h5>
+                <h5 class="modal-title font-weight-bold"><i class="fa fa-truck"></i> {{ __('db.Add Delivery') }}</h5>
                 <button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true">&times;</span></button>
             </div>
             <div class="modal-body">
-                <p class="italic"><small>{{ __('db.The field labels marked with * are required input fields') ?? 'The field labels marked with * are required input fields' }}.</small></p>
+                <p class="italic"><small>{{ __('db.The field labels marked with * are required input fields') }}.</small></p>
                 <div class="row">
                     <!-- Tailor Select (Only Percentage Tailors) -->
                     <div class="col-md-6 form-group">
-                        <label><strong>{{ __('db.Tailor') ?? 'Percentage Tailor' }} *</strong></label>
+                        <label><strong>{{ __('db.Tailor') }} *</strong></label>
                         <select name="tailor_id" id="add-del-tailor" class="form-control selectpicker" required data-live-search="true" title="Select Percentage Tailor...">
                             @foreach($percentage_tailors as $t)
                                 <option value="{{ $t->id }}" data-percentage="{{ $t->percentage }}">
@@ -273,60 +273,60 @@
 
                     <!-- Delivery Date -->
                     <div class="col-md-6 form-group">
-                        <label><strong>{{ __('db.Delivery Date') ?? 'Delivery Date' }} *</strong></label>
+                        <label><strong>{{ __('db.Delivery Date') }} *</strong></label>
                         <input type="date" name="delivery_date" class="form-control" value="{{ date('Y-m-d') }}" required>
                     </div>
 
                     <!-- Delivery Amount -->
                     <div class="col-md-4 form-group">
-                        <label><strong>{{ __('db.Delivery Amount') ?? 'Delivery Amount (TK)' }} *</strong></label>
+                        <label><strong>{{ __('db.Delivery Amount') }} *</strong></label>
                         <input type="number" step="0.01" min="0" name="delivery_amount" id="add-del-amount" required class="form-control" placeholder="e.g. 1000">
-                        <small class="form-text text-muted">মোট ডেলিভারি বিলের টাকা</small>
+                        <small class="form-text text-muted">{{ __('db.Total delivery bill amount') }}</small>
                     </div>
 
                     <!-- Percentage -->
                     <div class="col-md-4 form-group">
-                        <label><strong>{{ __('db.Percentage') ?? 'Owner Share %' }} *</strong></label>
+                        <label><strong>{{ __('db.Percentage') }} *</strong></label>
                         <div class="input-group">
                             <input type="number" step="0.01" min="0" max="100" name="percentage" id="add-del-percentage" required class="form-control" placeholder="25">
                             <div class="input-group-append">
                                 <span class="input-group-text">%</span>
                             </div>
                         </div>
-                        <small class="form-text text-muted">টেইলারের নির্ধারিত পার্সেন্টেজ</small>
+                        <small class="form-text text-muted">{{ __('db.Tailor agreed percentage') }}</small>
                     </div>
 
                     <!-- Owner Get (Auto Calculated) -->
                     <div class="col-md-4 form-group">
-                        <label><strong>{{ __('db.Owner Get') ?? 'Owner Get (মালিকের প্রাপ্য)' }} *</strong></label>
+                        <label><strong>{{ __('db.Owner Get') }} *</strong></label>
                         <input type="number" step="0.01" min="0" name="owner_get" id="add-del-owner-get" required class="form-control font-weight-bold text-primary bg-light" placeholder="0.00">
-                        <small class="form-text text-muted">পার্সেন্টেজ অনুযায়ী মালিকের মোট প্রাপ্য</small>
+                        <small class="form-text text-muted">{{ __('db.Total amount due to owner based on percentage') }}</small>
                     </div>
 
                     <!-- Paid Amount -->
                     <div class="col-md-6 form-group">
-                        <label><strong>{{ __('db.Paid Amount') ?? 'Paid Amount (কত পরিশোধ করল)' }} *</strong></label>
+                        <label><strong>{{ __('db.Paid Amount') }} *</strong></label>
                         <input type="number" step="0.01" min="0" name="paid_amount" id="add-del-paid" class="form-control font-weight-bold text-success" placeholder="0.00">
-                        <small class="form-text text-muted">টেইলার তাৎক্ষণিক কত টাকা জমা দিল</small>
+                        <small class="form-text text-muted">{{ __('db.Amount paid immediately by tailor') }}</small>
                     </div>
 
                     <!-- Due Amount (Readonly) -->
                     <div class="col-md-6 form-group">
-                        <label><strong>{{ __('db.Due Amount') ?? 'Due Amount (বাকি)' }}</strong></label>
+                        <label><strong>{{ __('db.Due Amount') }}</strong></label>
                         <input type="number" step="0.01" readonly id="add-del-due" class="form-control font-weight-bold text-danger bg-light" value="0.00">
-                        <small class="form-text text-muted">মালিকের প্রাপ্য থেকে বাকি টাকা</small>
+                        <small class="form-text text-muted">{{ __('db.Remaining due from owner share') }}</small>
                     </div>
 
                     <!-- Note -->
                     <div class="col-md-12 form-group">
-                        <label><strong>{{ __('db.Note') ?? 'Note' }}</strong></label>
+                        <label><strong>{{ __('db.Note') }}</strong></label>
                         <textarea name="note" rows="2" class="form-control" placeholder="Delivery details, order reference, customer info..."></textarea>
                     </div>
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">{{ __('db.close') ?? 'Close' }}</button>
-                <button type="submit" class="btn btn-primary"><i class="fa fa-check"></i> {{ __('db.submit') ?? 'Save Delivery' }}</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">{{ __('db.close') }}</button>
+                <button type="submit" class="btn btn-primary"><i class="fa fa-check"></i> {{ __('db.submit') }}</button>
             </div>
             {!! Form::close() !!}
         </div>
@@ -341,13 +341,13 @@
                 @csrf
                 @method('PUT')
                 <div class="modal-header">
-                    <h5 class="modal-title font-weight-bold"><i class="fa fa-truck"></i> {{ __('db.Edit Delivery') ?? 'Edit Tailor Delivery' }}</h5>
+                    <h5 class="modal-title font-weight-bold"><i class="fa fa-truck"></i> {{ __('db.Edit Delivery') }}</h5>
                     <button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true">&times;</span></button>
                 </div>
                 <div class="modal-body">
                     <div class="row">
                         <div class="col-md-6 form-group">
-                            <label><strong>{{ __('db.Tailor') ?? 'Tailor' }} *</strong></label>
+                            <label><strong>{{ __('db.Tailor') }} *</strong></label>
                             <select name="tailor_id" id="edit-del-tailor" class="form-control selectpicker" required data-live-search="true">
                                 @foreach($percentage_tailors as $t)
                                     <option value="{{ $t->id }}" data-percentage="{{ $t->percentage }}">
@@ -357,15 +357,15 @@
                             </select>
                         </div>
                         <div class="col-md-6 form-group">
-                            <label><strong>{{ __('db.Delivery Date') ?? 'Delivery Date' }} *</strong></label>
+                            <label><strong>{{ __('db.Delivery Date') }} *</strong></label>
                             <input type="date" name="delivery_date" id="edit-del-date" class="form-control" required>
                         </div>
                         <div class="col-md-4 form-group">
-                            <label><strong>{{ __('db.Delivery Amount') ?? 'Delivery Amount' }} *</strong></label>
+                            <label><strong>{{ __('db.Delivery Amount') }} *</strong></label>
                             <input type="number" step="0.01" min="0" name="delivery_amount" id="edit-del-amount" required class="form-control">
                         </div>
                         <div class="col-md-4 form-group">
-                            <label><strong>{{ __('db.Percentage') ?? 'Owner Share %' }} *</strong></label>
+                            <label><strong>{{ __('db.Percentage') }} *</strong></label>
                             <div class="input-group">
                                 <input type="number" step="0.01" min="0" max="100" name="percentage" id="edit-del-percentage" required class="form-control">
                                 <div class="input-group-append">
@@ -374,28 +374,28 @@
                             </div>
                         </div>
                         <div class="col-md-4 form-group">
-                            <label><strong>{{ __('db.Owner Get') ?? 'Owner Get' }} *</strong></label>
+                            <label><strong>{{ __('db.Owner Get') }} *</strong></label>
                             <input type="number" step="0.01" min="0" name="owner_get" id="edit-del-owner-get" required class="form-control font-weight-bold text-primary">
                         </div>
                         <div class="col-md-6 form-group">
-                            <label><strong>{{ __('db.Paid Amount') ?? 'Paid Amount (কত পরিশোধ করল)' }} *</strong></label>
+                            <label><strong>{{ __('db.Paid Amount') }} *</strong></label>
                             <input type="number" step="0.01" min="0" name="paid_amount" id="edit-del-paid" class="form-control font-weight-bold text-success" placeholder="0.00">
-                            <small class="form-text text-muted">টেইলার তাৎক্ষণিক কত টাকা জমা দিল</small>
+                            <small class="form-text text-muted">{{ __('db.Amount paid immediately by tailor') }}</small>
                         </div>
                         <div class="col-md-6 form-group">
-                            <label><strong>{{ __('db.Due Amount') ?? 'Due Amount (বাকি)' }}</strong></label>
+                            <label><strong>{{ __('db.Due Amount') }}</strong></label>
                             <input type="number" step="0.01" readonly id="edit-del-due" class="form-control font-weight-bold text-danger bg-light" value="0.00">
-                            <small class="form-text text-muted">মালিকের প্রাপ্য থেকে বাকি টাকা</small>
+                            <small class="form-text text-muted">{{ __('db.Remaining due from owner share') }}</small>
                         </div>
                         <div class="col-md-12 form-group">
-                            <label><strong>{{ __('db.Note') ?? 'Note' }}</strong></label>
+                            <label><strong>{{ __('db.Note') }}</strong></label>
                             <textarea name="note" id="edit-del-note" rows="2" class="form-control"></textarea>
                         </div>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">{{ __('db.close') ?? 'Close' }}</button>
-                    <button type="submit" class="btn btn-primary"><i class="fa fa-check"></i> {{ __('db.Update') ?? 'Update Delivery' }}</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">{{ __('db.close') }}</button>
+                    <button type="submit" class="btn btn-primary"><i class="fa fa-check"></i> {{ __('db.Update') }}</button>
                 </div>
             </form>
         </div>
@@ -409,7 +409,7 @@
             <form id="add-payment-form" method="post">
                 @csrf
                 <div class="modal-header">
-                    <h5 class="modal-title font-weight-bold text-success"><i class="fa fa-money"></i> {{ __('db.Add Payment for Due') ?? 'Collect Due Payment' }}</h5>
+                    <h5 class="modal-title font-weight-bold text-success"><i class="fa fa-money"></i> {{ __('db.Add Payment for Due') }}</h5>
                     <button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true">&times;</span></button>
                 </div>
                 <div class="modal-body">
@@ -426,23 +426,23 @@
 
                     <div class="row">
                         <div class="col-md-12 form-group">
-                            <label><strong>{{ __('db.Paying Amount') ?? 'Paying Amount (কত টাকা দিচ্ছে)' }} *</strong></label>
+                            <label><strong>{{ __('db.Paying Amount') }} *</strong></label>
                             <input type="number" step="0.01" min="0.01" name="amount" id="paying-amount-input" required class="form-control font-weight-bold text-success" placeholder="0.00">
-                            <small class="form-text text-muted">সর্বোচ্চ বকেয়া টাকার পরিমাণ ইনপুট দিতে পারেন</small>
+                            <small class="form-text text-muted">{{ __('db.Enter amount up to total due') }}</small>
                         </div>
                         <div class="col-md-12 form-group">
-                            <label><strong>{{ __('db.Payment Date') ?? 'Payment Date' }} *</strong></label>
+                            <label><strong>{{ __('db.Payment Date') }} *</strong></label>
                             <input type="date" name="payment_date" class="form-control" value="{{ date('Y-m-d') }}" required>
                         </div>
                         <div class="col-md-12 form-group">
-                            <label><strong>{{ __('db.Note') ?? 'Note' }}</strong></label>
+                            <label><strong>{{ __('db.Note') }}</strong></label>
                             <textarea name="note" rows="2" class="form-control" placeholder="e.g. Due cleared / Remaining payment..."></textarea>
                         </div>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">{{ __('db.close') ?? 'Close' }}</button>
-                    <button type="submit" class="btn btn-success"><i class="fa fa-check"></i> {{ __('db.Save Payment') ?? 'Confirm Payment' }}</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">{{ __('db.close') }}</button>
+                    <button type="submit" class="btn btn-success"><i class="fa fa-check"></i> {{ __('db.Save Payment') }}</button>
                 </div>
             </form>
         </div>
@@ -454,7 +454,7 @@
     <div role="document" class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title font-weight-bold"><i class="fa fa-history"></i> {{ __('db.Payment History') ?? 'Payment History' }} - <span id="history-ref"></span></h5>
+                <h5 class="modal-title font-weight-bold"><i class="fa fa-history"></i> {{ __('db.Payment History') }} - <span id="history-ref"></span></h5>
                 <button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true">&times;</span></button>
             </div>
             <div class="modal-body">
@@ -475,7 +475,7 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">{{ __('db.close') ?? 'Close' }}</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">{{ __('db.close') }}</button>
             </div>
         </div>
     </div>
@@ -489,7 +489,7 @@
     $("ul#tailor #tailor-delivery-menu").addClass("active");
 
     function confirmDelete() {
-        return confirm("{{ __('db.Are you sure want to delete?') ?? 'Are you sure want to delete this delivery?' }}");
+        return confirm("{{ __('db.Are you sure want to delete?') }}");
     }
 
     $(document).ready(function() {
@@ -684,9 +684,9 @@
         // ============================================
         $('#delivery-table').DataTable({
             'language': {
-                'lengthMenu': '_MENU_ {{ __('db.records per page') ?? 'records per page' }}',
-                "info": '<small>{{ __('db.Showing') ?? 'Showing' }} _START_ - _END_ (_TOTAL_)</small>',
-                "search": '{{ __('db.Search') ?? 'Search' }}',
+                'lengthMenu': '_MENU_ {{ __('db.records per page') }}',
+                "info": '<small>{{ __('db.Showing') }} _START_ - _END_ (_TOTAL_)</small>',
+                "search": '{{ __('db.Search') }}',
                 'paginate': {
                     'previous': '<i class="dripicons-chevron-left"></i>',
                     'next': '<i class="dripicons-chevron-right"></i>'
@@ -766,7 +766,7 @@
                                 if (id) delivery_id.push(id);
                             }
                         });
-                        if (delivery_id.length && confirm("{{ __('db.Are you sure want to delete?') ?? 'Are you sure want to delete?' }}")) {
+                        if (delivery_id.length && confirm("{{ __('db.Are you sure want to delete?') }}")) {
                             $.ajax({
                                 type: 'POST',
                                 url: '{{ route("tailor_deliveries.deletebyselection") }}',

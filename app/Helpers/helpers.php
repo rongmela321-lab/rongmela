@@ -56,3 +56,14 @@ if (!function_exists('normalize_to_sql_datetime')) {
         }
     }
 }
+
+if (!function_exists('_trans')) {
+    function _trans(string $key, ?string $fallback = null): string
+    {
+        $res = __('db.' . $key);
+        if ($res === 'db.' . $key) {
+            return $fallback ?? $key;
+        }
+        return $res;
+    }
+}

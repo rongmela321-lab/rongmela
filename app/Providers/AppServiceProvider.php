@@ -71,6 +71,20 @@ class AppServiceProvider extends ServiceProvider
                     if (!empty($translations)) {
                         app('translator')->addLines($translations, $currentLocale);
                     }
+
+                    app('translator')->handleMissingKeysUsing(function ($key, $replace, $locale, $fallback) {
+                        if (is_string($key) && str_starts_with($key, 'db.')) {
+                            $loc = $locale ?: \Illuminate\Support\Facades\App::getLocale();
+                            $defaults = \App\Models\Translation::getDefaultTranslations($loc);
+                            if (isset($defaults[$key])) {
+                                return $defaults[$key];
+                            }
+                            if ($loc === 'en') {
+                                return substr($key, 3);
+                            }
+                        }
+                        return $key;
+                    });
                 }
             } catch (\Exception $e) {
                 // Optional: log the error
