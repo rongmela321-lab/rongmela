@@ -9,6 +9,7 @@ return [
         "sidebar_transfer" => "Transfer",
         "sidebar_expense" => "Expense",
         "sidebar_income" => "Income",
+        "sidebar_tailor" => "Tailor",
         "sidebar_accounting" => "Accounting",
         "sidebar_hrm" => "HRM",
         "sidebar_people" => "People",

@@ -484,6 +484,10 @@
 
 @push('scripts')
 <script type="text/javascript">
+    $("ul#tailor").siblings('a').attr('aria-expanded','true');
+    $("ul#tailor").addClass("show");
+    $("ul#tailor #tailor-delivery-menu").addClass("active");
+
     function confirmDelete() {
         return confirm("{{ __('db.Are you sure want to delete?') ?? 'Are you sure want to delete this delivery?' }}");
     }
