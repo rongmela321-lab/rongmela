@@ -229,7 +229,7 @@ class ExpenseController extends Controller
             $data['document'] = $documentName;
         }
         if (isset($data['created_at'])) {
-            $data['created_at'] = normalize_to_sql_datetime($data['created_at']);
+            $data['created_at'] = normalize_to_sql_datetime($data['created_at'], true);
         } else {
             $data['created_at'] = date('Y-m-d H:i:s');
         }
@@ -238,13 +238,37 @@ class ExpenseController extends Controller
         $data['employee_id'] = $request->employee_id ?? null;
         $data['type'] = $request->type ?? $request->expense_type ?? null;
 
-        // record pos page expense in cash register
-        if(isset($data['cash_register'])){
+        // Auto-assign cash register if available
+        if(isset($data['cash_register']) && !empty($data['cash_register'])){
             $data['cash_register_id'] = $data['cash_register'];
+        } else {
+            $cash_register_data = CashRegister::where([
+                ['user_id', $data['user_id']],
+                ['warehouse_id', $data['warehouse_id']],
+                ['status', true]
+            ])->first();
+
+            if(!$cash_register_data) {
+                $cash_register_data = CashRegister::where([
+                    ['user_id', $data['user_id']],
+                    ['status', true]
+                ])->first();
+            }
+
+            if(!$cash_register_data && isset($data['warehouse_id'])) {
+                $cash_register_data = CashRegister::where([
+                    ['warehouse_id', $data['warehouse_id']],
+                    ['status', true]
+                ])->first();
+            }
+
+            if($cash_register_data) {
+                $data['cash_register_id'] = $cash_register_data->id;
+            }
         }
 
         Expense::create($data);
-        return redirect('expenses')->with('message', __('db.Data inserted successfully'));
+        return redirect()->back()->with('message', __('db.Data inserted successfully'));
     }
 
     public function show($id)
@@ -304,12 +328,32 @@ class ExpenseController extends Controller
             $data['document'] = $documentName;
         }
         if (isset($data['created_at'])) {
-            $data['created_at'] = normalize_to_sql_datetime($data['created_at']);
+            $data['created_at'] = normalize_to_sql_datetime($data['created_at'], true);
         } else {
             $data['created_at'] = date('Y-m-d H:i:s');
         }
+
+        if (empty($lims_expense_data->cash_register_id) && empty($data['cash_register_id'])) {
+            $cash_register_data = CashRegister::where([
+                ['user_id', $lims_expense_data->user_id ?? Auth::id()],
+                ['warehouse_id', $data['warehouse_id'] ?? $lims_expense_data->warehouse_id],
+                ['status', true]
+            ])->first();
+
+            if(!$cash_register_data) {
+                $cash_register_data = CashRegister::where([
+                    ['user_id', $lims_expense_data->user_id ?? Auth::id()],
+                    ['status', true]
+                ])->first();
+            }
+
+            if($cash_register_data) {
+                $data['cash_register_id'] = $cash_register_data->id;
+            }
+        }
+
         $lims_expense_data->update($data);
-        return redirect('expenses')->with('message', __('db.Data updated successfully'));
+        return redirect()->back()->with('message', __('db.Data updated successfully'));
     }
 
     public function deleteBySelection(Request $request)

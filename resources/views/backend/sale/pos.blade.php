@@ -304,7 +304,7 @@
                                     ?>
                                     @if($add_expense_permission)
                                     <li>
-                                        <a href="" data-toggle="modal" data-target="#expense-modal"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M21 12a2.25 2.25 0 0 0-2.25-2.25H15a3 3 0 1 1-6 0H5.25A2.25 2.25 0 0 0 3 12m18 0v6a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 18v-6m18 0V9M3 12V9m18 0a2.25 2.25 0 0 0-2.25-2.25H5.25A2.25 2.25 0 0 0 3 9m18 0V6a2.25 2.25 0 0 0-2.25-2.25H5.25A2.25 2.25 0 0 0 3 6v3" /></svg> {{__('db.Add Expense')}}</a>
+                                        <a href="javascript:void(0)" data-toggle="modal" data-target="#expense-modal"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M21 12a2.25 2.25 0 0 0-2.25-2.25H15a3 3 0 1 1-6 0H5.25A2.25 2.25 0 0 0 3 12m18 0v6a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 18v-6m18 0V9M3 12V9m18 0a2.25 2.25 0 0 0-2.25-2.25H5.25A2.25 2.25 0 0 0 3 9m18 0V6a2.25 2.25 0 0 0-2.25-2.25H5.25A2.25 2.25 0 0 0 3 6v3" /></svg> {{__('db.Add Expense')}}</a>
                                     </li>
                                     @endif
                                     <?php
@@ -312,7 +312,7 @@
                                     ?>
                                     @if($add_payment_permission)
                                     <li>
-                                        <a href="" class="add-supplier-payment" data-toggle="modal" data-target="#add-supplier-payment"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg> {{__('db.Add Payment')}}</a>
+                                        <a href="javascript:void(0)" class="add-supplier-payment" data-toggle="modal" data-target="#add-supplier-payment"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg> {{__('db.Add Payment')}}</a>
                                     </li>
                                     @endif
                                     <?php
@@ -3241,6 +3241,25 @@
         $('#closing_row').show();
         $('#submit_register').show();
         $(this).hide();
+    });
+
+    $('#expense-modal').on('show.bs.modal', function() {
+        var current_reg_id = $("#register-details-btn").data('id');
+        if (current_reg_id) {
+            $('#expense-modal input[name="cash_register"]').val(current_reg_id);
+        }
+        var current_wh_id = $('#warehouse_id').val();
+        if (current_wh_id) {
+            $('#expense-modal select[name="warehouse_id"]').val(current_wh_id);
+            $('#expense-modal select[name="warehouse_id"]').selectpicker('refresh');
+        }
+    });
+
+    $('#add-supplier-payment').on('show.bs.modal', function() {
+        var current_reg_id = $("#register-details-btn").data('id');
+        if (current_reg_id) {
+            $('#add-supplier-payment input[name="cash_register"]').val(current_reg_id);
+        }
     });
     @endif
 

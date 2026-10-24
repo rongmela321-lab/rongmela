@@ -35,6 +35,36 @@ class CashRegisterController extends Controller
 	{
 		$cash_register_data = CashRegister::find($id);
 
+		if ($cash_register_data && $cash_register_data->status) {
+			// Auto-link unassigned expenses created during this open register session
+			Expense::where(function($q) {
+				$q->whereNull('cash_register_id')->orWhere('cash_register_id', 0);
+			})
+			->where(function($q) use ($cash_register_data) {
+				$q->where('warehouse_id', $cash_register_data->warehouse_id)
+				  ->orWhere('user_id', $cash_register_data->user_id);
+			})
+			->whereDate('created_at', '>=', date('Y-m-d', strtotime($cash_register_data->created_at)))
+			->update(['cash_register_id' => $cash_register_data->id]);
+
+			// Auto-link unassigned supplier payments created during this open register session
+			Payment::where(function($q) {
+				$q->whereNull('cash_register_id')->orWhere('cash_register_id', 0);
+			})
+			->whereNotNull('purchase_id')
+			->where(function($q) use ($cash_register_data) {
+				$q->where('user_id', $cash_register_data->user_id)
+				  ->orWhereExists(function ($subQuery) use ($cash_register_data) {
+					  $subQuery->select(DB::raw(1))
+							   ->from('purchases')
+							   ->whereColumn('purchases.id', 'payments.purchase_id')
+							   ->where('purchases.warehouse_id', $cash_register_data->warehouse_id);
+				  });
+			})
+			->whereDate('created_at', '>=', date('Y-m-d', strtotime($cash_register_data->created_at)))
+			->update(['cash_register_id' => $cash_register_data->id]);
+		}
+
 		$data['cash_in_hand'] = $cash_register_data->cash_in_hand;
 		$data['total_sale_amount'] = Sale::where([
 										['cash_register_id', $cash_register_data->id],
@@ -92,10 +122,40 @@ class CashRegisterController extends Controller
 	public function close(Request $request)
 	{
 		$cash_register_data = CashRegister::find($request->cash_register_id);
-		$cash_register_data->closing_balance = $request->closing_balance;
-		$cash_register_data->actual_cash = $request->actual_cash;
-		$cash_register_data->status = 0;
-		$cash_register_data->save();
+		if ($cash_register_data) {
+			// Auto-link unassigned expenses created during this open register session
+			Expense::where(function($q) {
+				$q->whereNull('cash_register_id')->orWhere('cash_register_id', 0);
+			})
+			->where(function($q) use ($cash_register_data) {
+				$q->where('warehouse_id', $cash_register_data->warehouse_id)
+				  ->orWhere('user_id', $cash_register_data->user_id);
+			})
+			->whereDate('created_at', '>=', date('Y-m-d', strtotime($cash_register_data->created_at)))
+			->update(['cash_register_id' => $cash_register_data->id]);
+
+			// Auto-link unassigned supplier payments created during this open register session
+			Payment::where(function($q) {
+				$q->whereNull('cash_register_id')->orWhere('cash_register_id', 0);
+			})
+			->whereNotNull('purchase_id')
+			->where(function($q) use ($cash_register_data) {
+				$q->where('user_id', $cash_register_data->user_id)
+				  ->orWhereExists(function ($subQuery) use ($cash_register_data) {
+					  $subQuery->select(DB::raw(1))
+							   ->from('purchases')
+							   ->whereColumn('purchases.id', 'payments.purchase_id')
+							   ->where('purchases.warehouse_id', $cash_register_data->warehouse_id);
+				  });
+			})
+			->whereDate('created_at', '>=', date('Y-m-d', strtotime($cash_register_data->created_at)))
+			->update(['cash_register_id' => $cash_register_data->id]);
+
+			$cash_register_data->closing_balance = $request->closing_balance;
+			$cash_register_data->actual_cash = $request->actual_cash;
+			$cash_register_data->status = 0;
+			$cash_register_data->save();
+		}
 		return redirect()->back()->with('message', __('db.Cash register closed successfully'));
 	}
 

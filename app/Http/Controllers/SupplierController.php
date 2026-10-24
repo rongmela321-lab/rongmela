@@ -56,8 +56,20 @@ class SupplierController extends Controller
 
             if($request->cash_register)
                 $cash_register_id = $request->cash_register;
-            else
-                $cash_register_id = null;
+            else {
+                $cash_register_data = CashRegister::where([
+                    ['user_id', Auth::id()],
+                    ['warehouse_id', $purchase_data->warehouse_id],
+                    ['status', true]
+                ])->first();
+                if(!$cash_register_data) {
+                    $cash_register_data = CashRegister::where([
+                        ['user_id', Auth::id()],
+                        ['status', true]
+                    ])->first();
+                }
+                $cash_register_id = $cash_register_data ? $cash_register_data->id : null;
+            }
             $account_data = Account::select('id')->where('is_default', 1)->first();
             if($total_paid_amount >= $due_amount) {
                 $paid_amount = $due_amount;
