@@ -152,6 +152,11 @@ class Translation extends Model
                 'db.records per page' => 'প্রতি পেজে রেকর্ড',
                 'db.Are you sure want to delete?' => 'আপনি কি নিশ্চিত মুছে ফেলতে চান?',
                 'db.The field labels marked with * are required input fields' => '* চিহ্নিত ফিল্ডগুলো পূরণ করা আবশ্যক',
+                'db.Products in Shop' => 'দোকানে থাকা পণ্য',
+                'db.Best Supplier Product' => 'সেরা সরবরাহকারী পণ্য',
+                'db.Sold Qty' => 'বিক্রয়কৃত পরিমাণ',
+                'db.View Products' => 'পণ্যসমূহ দেখুন',
+                'db.in stock' => 'স্টকে আছে',
             ];
         }
 
@@ -258,6 +263,11 @@ class Translation extends Model
             'db.records per page' => 'records per page',
             'db.Are you sure want to delete?' => 'Are you sure want to delete?',
             'db.The field labels marked with * are required input fields' => 'The field labels marked with * are required input fields',
+            'db.Products in Shop' => 'Products in Shop',
+            'db.Best Supplier Product' => 'Best Supplier Product',
+            'db.Sold Qty' => 'Sold Qty',
+            'db.View Products' => 'View Products',
+            'db.in stock' => 'in stock',
         ];
     }
 

@@ -35,7 +35,81 @@ class SupplierController extends Controller
             if(empty($all_permission))
                 $all_permission[] = 'dummy text';
             $lims_supplier_all = Supplier::where('is_active', true)->get();
-            return view('backend.supplier.index',compact('lims_supplier_all', 'all_permission'));
+
+            $warehouse_id = (Auth::user()->role_id > 2 && Auth::user()->warehouse_id) ? Auth::user()->warehouse_id : null;
+
+            if ($warehouse_id) {
+                $purchased_products = DB::table('product_purchases')
+                    ->join('purchases', 'product_purchases.purchase_id', '=', 'purchases.id')
+                    ->join('products', 'product_purchases.product_id', '=', 'products.id')
+                    ->leftJoin('product_warehouse', function($join) use ($warehouse_id) {
+                        $join->on('products.id', '=', 'product_warehouse.product_id')
+                             ->where('product_warehouse.warehouse_id', '=', $warehouse_id);
+                    })
+                    ->whereNull('purchases.deleted_at')
+                    ->whereNotNull('purchases.supplier_id')
+                    ->where('products.is_active', true)
+                    ->select(
+                        'product_purchases.product_id',
+                        'purchases.supplier_id',
+                        'products.name as product_name',
+                        'products.code as product_code',
+                        'products.image as product_image',
+                        DB::raw('COALESCE(product_warehouse.qty, 0) as current_stock')
+                    )
+                    ->orderBy('purchases.id', 'desc')
+                    ->get()
+                    ->unique('product_id');
+            } else {
+                $purchased_products = DB::table('product_purchases')
+                    ->join('purchases', 'product_purchases.purchase_id', '=', 'purchases.id')
+                    ->join('products', 'product_purchases.product_id', '=', 'products.id')
+                    ->whereNull('purchases.deleted_at')
+                    ->whereNotNull('purchases.supplier_id')
+                    ->where('products.is_active', true)
+                    ->select(
+                        'product_purchases.product_id',
+                        'purchases.supplier_id',
+                        'products.name as product_name',
+                        'products.code as product_code',
+                        'products.image as product_image',
+                        'products.qty as current_stock'
+                    )
+                    ->orderBy('purchases.id', 'desc')
+                    ->get()
+                    ->unique('product_id');
+            }
+
+            $supplier_product_stocks = [];
+            $supplier_products_list = [];
+
+            foreach ($purchased_products as $item) {
+                $sid = $item->supplier_id;
+                if (!isset($supplier_product_stocks[$sid])) {
+                    $supplier_product_stocks[$sid] = [
+                        'total_qty' => 0,
+                        'in_stock_products' => 0,
+                        'total_products' => 0,
+                    ];
+                    $supplier_products_list[$sid] = [];
+                }
+
+                $stock = (float)$item->current_stock;
+                $supplier_product_stocks[$sid]['total_products']++;
+                if ($stock > 0) {
+                    $supplier_product_stocks[$sid]['total_qty'] += $stock;
+                    $supplier_product_stocks[$sid]['in_stock_products']++;
+                }
+
+                $supplier_products_list[$sid][] = [
+                    'name' => $item->product_name,
+                    'code' => $item->product_code,
+                    'image' => $item->product_image,
+                    'stock' => $stock
+                ];
+            }
+
+            return view('backend.supplier.index', compact('lims_supplier_all', 'all_permission', 'supplier_product_stocks', 'supplier_products_list'));
         }
         else
             return redirect()->back()->with('not_permitted', __('db.Sorry! You are not allowed to access this module'));

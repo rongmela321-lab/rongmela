@@ -213,6 +213,8 @@ Route::group(['middleware' => ['common', 'auth', 'active']], function () {
         Route::get('/yearly-best-selling-price', 'yearlyBestSellingPrice');
         Route::get('/yearly-best-selling-qty', 'yearlyBestSellingQty');
         Route::get('/monthly-best-selling-qty', 'monthlyBestSellingQty');
+        Route::get('/yearly-best-selling-supplier', 'yearlyBestSellingSupplier');
+        Route::get('/yearly-best-selling-supplier-price', 'yearlyBestSellingSupplierPrice');
         Route::get('/recent-sale', 'recentSale');
         Route::get('/recent-purchase', 'recentPurchase');
         Route::get('/recent-quotation', 'recentQuotation');

@@ -19,6 +19,7 @@
                     <th class="not-exported"></th>
                     <th>{{__('db.Image')}}</th>
                     <th>{{__('db.Supplier Details')}}</th>
+                    <th>{{__('db.Products in Shop')}}</th>
                     <th>{{__('db.Total Due')}}</th>
                     <th class="not-exported">{{__('db.action')}}</th>
                 </tr>
@@ -61,6 +62,39 @@
                             @if($supplier->postal_code){{','.$supplier->postal_code}}@endif
                             @if($supplier->country){{','.$supplier->country}}@endif
                     </td>
+                    <td>
+                        @php
+                            $stockInfo = $supplier_product_stocks[$supplier->id] ?? ['total_qty' => 0, 'in_stock_products' => 0, 'total_products' => 0];
+                            $productsList = $supplier_products_list[$supplier->id] ?? [];
+                        @endphp
+                        @if($stockInfo['total_qty'] > 0)
+                            <button type="button" class="btn btn-outline-success btn-sm font-weight-bold view-supplier-products" 
+                                    data-supplier="{{ $supplier->name }}" 
+                                    data-products='@json($productsList)'
+                                    title="{{ __('db.View Products') }}">
+                                <i class="dripicons-box"></i> {{ $stockInfo['total_qty'] }} {{ __('db.qty') }}
+                            </button>
+                            <div class="mt-1" style="font-size: 12px; color: #555;">
+                                <span class="badge badge-light border">{{ $stockInfo['in_stock_products'] }} {{ __('db.in stock') }}</span>
+                                @if($stockInfo['total_products'] > $stockInfo['in_stock_products'])
+                                    <span class="text-muted">({{ $stockInfo['total_products'] }} {{ __('db.Total') }})</span>
+                                @endif
+                            </div>
+                        @else
+                            <button type="button" class="btn btn-outline-secondary btn-sm view-supplier-products" 
+                                    data-supplier="{{ $supplier->name }}" 
+                                    data-products='@json($productsList)'
+                                    title="{{ __('db.View Products') }}">
+                                0 {{ __('db.qty') }}
+                            </button>
+                            <div class="mt-1 text-muted" style="font-size: 11px;">
+                                0 {{ __('db.in stock') }}
+                                @if($stockInfo['total_products'] > 0)
+                                    <span>({{ $stockInfo['total_products'] }} {{ __('db.Total') }})</span>
+                                @endif
+                            </div>
+                        @endif
+                    </td>
                     <td>{{number_format($purchaseData->grand_total - $returned_amount - $purchaseData->paid_amount, 2)}}</td>
                     <td>
                         <div class="btn-group">
@@ -69,6 +103,11 @@
                                 <span class="sr-only">Toggle Dropdown</span>
                             </button>
                             <ul class="dropdown-menu edit-options dropdown-menu-right dropdown-default" user="menu">
+                                <li>
+                                    <button type="button" class="btn btn-link view-supplier-products" data-supplier="{{ $supplier->name }}" data-products='@json($productsList)'>
+                                        <i class="dripicons-box"></i> {{ __('db.Products in Shop') }}
+                                    </button>
+                                </li>
                                 @if(in_array("suppliers-index", $all_permission))
                                     <li>
                                         <a href="{{ route('supplier.show', $supplier->id) }}" class="btn btn-link">
@@ -192,10 +231,61 @@
 	</div>
 </div>
 
+<div id="supplier-products-modal" tabindex="-1" role="dialog" aria-hidden="true" class="modal fade text-left">
+    <div role="document" class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><span id="modal-supplier-name"></span> - {{ __('db.Products in Shop') }}</h5>
+                <button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true">&times;</span></button>
+            </div>
+            <div class="modal-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped" id="supplier-products-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>{{ __('db.Image') }}</th>
+                                <th>{{ __('db.Product Details') }}</th>
+                                <th>{{ __('db.qty') }}</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 @endsection
 
 @push('scripts')
 <script type="text/javascript">
+
+    $(document).on('click', '.view-supplier-products', function() {
+        var supplierName = $(this).data('supplier');
+        var products = $(this).data('products');
+        $('#modal-supplier-name').text(supplierName);
+        var tbody = $('#supplier-products-table tbody');
+        tbody.empty();
+        if (products && products.length > 0) {
+            var productImgUrl = '{{ url("images/product") }}';
+            var defaultImg = '{{ url("images/product/zummXD2dvAtI.png") }}';
+            products.forEach(function(p, idx) {
+                var img = p.image ? (productImgUrl + '/' + p.image.split(',')[0]) : defaultImg;
+                var badgeClass = p.stock > 0 ? 'badge-success' : 'badge-danger';
+                tbody.append('<tr>' +
+                    '<td>' + (idx + 1) + '</td>' +
+                    '<td><img src="' + img + '" width="40" height="40" style="object-fit:cover; border-radius:4px;"></td>' +
+                    '<td><strong>' + p.name + '</strong><br><small class="text-muted">' + p.code + '</small></td>' +
+                    '<td><span class="badge ' + badgeClass + '" style="font-size:13px;">' + p.stock + '</span></td>' +
+                    '</tr>');
+            });
+        } else {
+            tbody.append('<tr><td colspan="4" class="text-center text-muted py-3">{{ __("db.No Data Available") }}</td></tr>');
+        }
+        $('#supplier-products-modal').modal('show');
+    });
 
     $("ul#people").siblings('a').attr('aria-expanded','true');
     $("ul#people").addClass("show");
@@ -237,7 +327,7 @@
         'columnDefs': [
             {
                 "orderable": false,
-                'targets': [0, 1, 2, 3]
+                'targets': [0, 1, 2, 5]
             },
             {
                 'checkboxes': {

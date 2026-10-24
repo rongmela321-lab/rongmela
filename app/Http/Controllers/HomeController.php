@@ -16,6 +16,7 @@ use App\Models\Payment;
 use App\Models\Account;
 use App\Models\Product_Sale;
 use App\Models\Customer;
+use App\Models\Supplier;
 use App\Models\Product;
 use App\Models\RewardPointSetting;
 use App\Models\Product_Warehouse;
@@ -412,6 +413,134 @@ class HomeController extends Controller
         ->get();
 
         return response()->json($best_selling_qty);
+    }
+
+    public function yearlyBestSellingSupplier()
+    {
+        config()->set('database.connections.mysql.strict', false);
+        DB::reconnect();
+
+        $product_supplier_map = DB::table('product_purchases')
+            ->join('purchases', 'product_purchases.purchase_id', '=', 'purchases.id')
+            ->whereNull('purchases.deleted_at')
+            ->whereNotNull('purchases.supplier_id')
+            ->select('product_purchases.product_id', 'purchases.supplier_id', 'purchases.id')
+            ->orderBy('purchases.id', 'desc')
+            ->get()
+            ->unique('product_id')
+            ->pluck('supplier_id', 'product_id');
+
+        $product_sales_yearly = DB::table('product_sales')
+            ->join('sales', 'product_sales.sale_id', '=', 'sales.id')
+            ->whereNull('sales.deleted_at')
+            ->whereYear('product_sales.created_at', date("Y"))
+            ->select(
+                'product_sales.product_id',
+                DB::raw('SUM(product_sales.qty) as sold_qty'),
+                DB::raw('SUM(product_sales.total / sales.exchange_rate) as total_price')
+            )
+            ->groupBy('product_sales.product_id')
+            ->get();
+
+        $supplier_qty_totals = [];
+        $supplier_price_totals = [];
+        $supplier_product_counts = [];
+
+        foreach ($product_sales_yearly as $ps) {
+            $sid = $product_supplier_map[$ps->product_id] ?? null;
+            if ($sid) {
+                $supplier_qty_totals[$sid] = ($supplier_qty_totals[$sid] ?? 0) + (float)$ps->sold_qty;
+                $supplier_price_totals[$sid] = ($supplier_price_totals[$sid] ?? 0) + (float)$ps->total_price;
+                $supplier_product_counts[$sid] = ($supplier_product_counts[$sid] ?? 0) + 1;
+            }
+        }
+
+        arsort($supplier_qty_totals);
+        $top_supplier_ids = array_slice(array_keys($supplier_qty_totals), 0, 5);
+
+        $suppliers = Supplier::whereIn('id', $top_supplier_ids)->get()->keyBy('id');
+
+        $result = [];
+        foreach ($top_supplier_ids as $sid) {
+            if (isset($suppliers[$sid])) {
+                $sup = $suppliers[$sid];
+                $result[] = [
+                    'supplier_id' => $sup->id,
+                    'supplier_name' => $sup->name,
+                    'company_name' => $sup->company_name,
+                    'supplier_image' => $sup->image,
+                    'sold_qty' => $supplier_qty_totals[$sid],
+                    'total_price' => number_format($supplier_price_totals[$sid] ?? 0, config('decimal'), '.', ''),
+                    'product_count' => $supplier_product_counts[$sid] ?? 0,
+                ];
+            }
+        }
+
+        return response()->json($result);
+    }
+
+    public function yearlyBestSellingSupplierPrice()
+    {
+        config()->set('database.connections.mysql.strict', false);
+        DB::reconnect();
+
+        $product_supplier_map = DB::table('product_purchases')
+            ->join('purchases', 'product_purchases.purchase_id', '=', 'purchases.id')
+            ->whereNull('purchases.deleted_at')
+            ->whereNotNull('purchases.supplier_id')
+            ->select('product_purchases.product_id', 'purchases.supplier_id', 'purchases.id')
+            ->orderBy('purchases.id', 'desc')
+            ->get()
+            ->unique('product_id')
+            ->pluck('supplier_id', 'product_id');
+
+        $product_sales_yearly = DB::table('product_sales')
+            ->join('sales', 'product_sales.sale_id', '=', 'sales.id')
+            ->whereNull('sales.deleted_at')
+            ->whereYear('product_sales.created_at', date("Y"))
+            ->select(
+                'product_sales.product_id',
+                DB::raw('SUM(product_sales.qty) as sold_qty'),
+                DB::raw('SUM(product_sales.total / sales.exchange_rate) as total_price')
+            )
+            ->groupBy('product_sales.product_id')
+            ->get();
+
+        $supplier_price_totals = [];
+        $supplier_qty_totals = [];
+        $supplier_product_counts = [];
+
+        foreach ($product_sales_yearly as $ps) {
+            $sid = $product_supplier_map[$ps->product_id] ?? null;
+            if ($sid) {
+                $supplier_price_totals[$sid] = ($supplier_price_totals[$sid] ?? 0) + (float)$ps->total_price;
+                $supplier_qty_totals[$sid] = ($supplier_qty_totals[$sid] ?? 0) + (float)$ps->sold_qty;
+                $supplier_product_counts[$sid] = ($supplier_product_counts[$sid] ?? 0) + 1;
+            }
+        }
+
+        arsort($supplier_price_totals);
+        $top_supplier_ids = array_slice(array_keys($supplier_price_totals), 0, 5);
+
+        $suppliers = Supplier::whereIn('id', $top_supplier_ids)->get()->keyBy('id');
+
+        $result = [];
+        foreach ($top_supplier_ids as $sid) {
+            if (isset($suppliers[$sid])) {
+                $sup = $suppliers[$sid];
+                $result[] = [
+                    'supplier_id' => $sup->id,
+                    'supplier_name' => $sup->name,
+                    'company_name' => $sup->company_name,
+                    'supplier_image' => $sup->image,
+                    'sold_qty' => $supplier_qty_totals[$sid] ?? 0,
+                    'total_price' => number_format($supplier_price_totals[$sid], config('decimal'), '.', ''),
+                    'product_count' => $supplier_product_counts[$sid] ?? 0,
+                ];
+            }
+        }
+
+        return response()->json($result);
     }
 
     public function recentSale()

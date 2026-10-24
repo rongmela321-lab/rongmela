@@ -473,6 +473,52 @@
                         </div>
                     </div>
                 </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h4>{{ __('db.Best Supplier Product') . ' ' . date('Y') . '(' . __('db.qty') . ')' }}</h4>
+                            <div class="right-column">
+                                <div class="badge badge-primary">{{ __('db.top') }} 5</div>
+                            </div>
+                        </div>
+                        <div class="table-responsive">
+                            <table id="yearly-best-selling-supplier" class="table">
+                                <thead>
+                                    <tr>
+                                        <th>{{ __('db.Supplier Details') }}</th>
+                                        <th>{{ __('db.qty') }}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h4>{{ __('db.Best Supplier Product') . ' ' . date('Y') . '(' . __('db.Price') . ')' }}</h4>
+                            <div class="right-column">
+                                <div class="badge badge-primary">{{ __('db.top') }} 5</div>
+                            </div>
+                        </div>
+                        <div class="table-responsive">
+                            <table id="yearly-best-selling-supplier-price" class="table">
+                                <thead>
+                                    <tr>
+                                        <th>{{ __('db.Supplier Details') }}</th>
+                                        <th>{{ __('db.grand total') }}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </section>
@@ -548,6 +594,68 @@
                             .product_name + ' [' + item.product_code + ']</div></td><td>' +
                             item.sold_qty + '</td></tr>');
                     })
+                }
+            });
+        });
+
+        $(document).ready(function() {
+            $.ajax({
+                url: '{{ url('/yearly-best-selling-supplier') }}',
+                type: 'GET',
+                dataType: 'json',
+                success: function(data) {
+                    var supplierUrl = '{{ url('/images/supplier') }}';
+                    var defaultImg = '{{ url('/images/product/zummXD2dvAtI.png') }}';
+                    if (!data || data.length === 0) {
+                        $('#yearly-best-selling-supplier').find('tbody').append(
+                            '<tr><td colspan="2" class="text-center text-muted py-3">{{ __("db.No Data Available") }}</td></tr>'
+                        );
+                    } else {
+                        data.forEach(function(item) {
+                            var imgSrc = item.supplier_image ? (supplierUrl + '/' + item.supplier_image) : defaultImg;
+                            var details = '<strong>' + item.supplier_name + '</strong>';
+                            if (item.company_name) {
+                                details += ' <small class="text-muted">(' + item.company_name + ')</small>';
+                            }
+                            $('#yearly-best-selling-supplier').find('tbody').append(
+                                '<tr><td><div class="d-flex align-items-center"><img src="' +
+                                imgSrc + '" width="30" height="30" class="rounded-circle ml-2 mr-3" style="object-fit: cover;"> <div>' +
+                                details + '</div></div></td><td><span class="badge badge-primary" style="font-size: 13px;">' +
+                                item.sold_qty + '</span></td></tr>'
+                            );
+                        });
+                    }
+                }
+            });
+        });
+
+        $(document).ready(function() {
+            $.ajax({
+                url: '{{ url('/yearly-best-selling-supplier-price') }}',
+                type: 'GET',
+                dataType: 'json',
+                success: function(data) {
+                    var supplierUrl = '{{ url('/images/supplier') }}';
+                    var defaultImg = '{{ url('/images/product/zummXD2dvAtI.png') }}';
+                    if (!data || data.length === 0) {
+                        $('#yearly-best-selling-supplier-price').find('tbody').append(
+                            '<tr><td colspan="2" class="text-center text-muted py-3">{{ __("db.No Data Available") }}</td></tr>'
+                        );
+                    } else {
+                        data.forEach(function(item) {
+                            var imgSrc = item.supplier_image ? (supplierUrl + '/' + item.supplier_image) : defaultImg;
+                            var details = '<strong>' + item.supplier_name + '</strong>';
+                            if (item.company_name) {
+                                details += ' <small class="text-muted">(' + item.company_name + ')</small>';
+                            }
+                            $('#yearly-best-selling-supplier-price').find('tbody').append(
+                                '<tr><td><div class="d-flex align-items-center"><img src="' +
+                                imgSrc + '" width="30" height="30" class="rounded-circle ml-2 mr-3" style="object-fit: cover;"> <div>' +
+                                details + '</div></div></td><td>' +
+                                item.total_price + '</td></tr>'
+                            );
+                        });
+                    }
                 }
             });
         });
