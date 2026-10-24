@@ -114,7 +114,8 @@ class CashRegisterController extends Controller
 										->sum(DB::raw('amount / exchange_rate'));
 		$data['total_sale_return'] = Returns::where('cash_register_id', $cash_register_data->id)->sum(DB::raw('grand_total / exchange_rate'));
 		$data['total_expense'] = Expense::where('cash_register_id', $cash_register_data->id)->sum('amount');
-		$data['total_cash'] = $data['cash_in_hand'] + $data['total_payment'] - ($data['total_sale_return'] + $data['total_expense'] + $data['total_supplier_payment']);
+		$data['total_cash'] = $data['cash_in_hand'] + $data['cash_payment'] - ($data['total_sale_return'] + $data['total_expense'] + $data['total_supplier_payment']);
+		$data['total_balance'] = $data['cash_in_hand'] + $data['total_payment'] - ($data['total_sale_return'] + $data['total_expense'] + $data['total_supplier_payment']);
 		$data['status'] = $cash_register_data->status;
 		return $data;
 	}

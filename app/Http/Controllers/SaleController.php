@@ -4453,8 +4453,9 @@ class SaleController extends Controller
         $data['total_expense'] = Expense::whereDate('created_at', date("Y-m-d"))
             ->sum('amount');
 
-        // 🔹 Net cash = payments - (returns + expenses)
-        $data['total_cash'] = $data['total_payment'] - ($data['total_sale_return'] + $data['total_expense']);
+        // 🔹 Net cash = cash_payment - (returns + expenses)
+        $data['total_cash'] = ((float)($data['cash_payment'] ?? 0)) - (((float)($data['total_sale_return'] ?? 0)) + ((float)($data['total_expense'] ?? 0)));
+        $data['total_balance'] = ((float)($data['total_payment'] ?? 0)) - (((float)($data['total_sale_return'] ?? 0)) + ((float)($data['total_expense'] ?? 0)));
 
         return $data;
     }

@@ -1543,8 +1543,12 @@
                                                     <td class="total_expense text-right"></td>
                                                 </tr>
                                                 <tr>
-                                                    <td><strong>{{__('db.Total Cash')}}:</strong></td>
-                                                    <td class="total_cash text-right"></td>
+                                                    <td><strong>{{__('db.Total Cash')}} ({{__('db.Total Cash (in Drawer)')}}):</strong></td>
+                                                    <td class="total_cash text-right font-weight-bold text-success"></td>
+                                                </tr>
+                                                <tr>
+                                                    <td><strong>{{__('db.Total Balance')}} ({{__('db.All Methods')}}):</strong></td>
+                                                    <td class="total_balance text-right font-weight-bold text-info"></td>
                                                 </tr>
                                             </tbody>
                                         </table>
@@ -1830,8 +1834,12 @@
                                         <td id="total_supplier_payment" class="text-right"></td>
                                     </tr>
                                     <tr>
-                                        <td><strong>{{__('db.Total Cash')}}:</strong></td>
-                                        <td id="total_cash" class="text-right"></td>
+                                        <td><strong>{{__('db.Total Cash')}} ({{__('db.Total Cash (in Drawer)')}}):</strong></td>
+                                        <td id="total_cash" class="text-right font-weight-bold text-success"></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>{{__('db.Total Balance')}} ({{__('db.All Methods')}}):</strong></td>
+                                        <td id="total_balance" class="text-right font-weight-bold text-info"></td>
                                     </tr>
                                     <tr id="closing_row" style="display:none">
                                         <td><strong>{{__('db.Actual Cash')}}:</strong></td>
@@ -3227,6 +3235,7 @@
                 $('#register-details-modal #total_sale_return').text(data['total_sale_return']);
                 $('#register-details-modal #total_expense').text(data['total_expense']);
                 $('#register-details-modal #total_cash').text(data['total_cash']);
+                $('#register-details-modal #total_balance').text(data['total_balance']);
                 $('#register-details-modal input[name=actual_cash]').val(data['total_cash']);
                 $('#register-details-modal input[name=closing_balance]').val(data['total_cash']);
                 $('#register-details-modal #total_supplier_payment').text(data['total_supplier_payment']);
@@ -3280,6 +3289,7 @@
                 $('#today-sale-modal .total_sale_return').text(data['total_sale_return']);
                 $('#today-sale-modal .total_expense').text(data['total_expense']);
                 $('#today-sale-modal .total_cash').text(data['total_cash']);
+                $('#today-sale-modal .total_balance').text(data['total_balance']);
             }
         });
         $('#today-sale-modal').modal('show');

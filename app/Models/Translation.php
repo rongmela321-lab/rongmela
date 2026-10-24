@@ -163,6 +163,9 @@ class Translation extends Model
                 'db.Returned to Tailor' => 'দর্জি পেল / ফেরত',
                 'db.Total Tailor Income' => 'মাস্টারদের মোট আয়',
                 'db.Tailor Share / Return to Tailor' => 'দর্জি পেল / ফেরত',
+                'db.Total Balance' => 'সর্বমোট ব্যালেন্স',
+                'db.All Methods' => 'সকল মাধ্যম',
+                'db.Total Cash (in Drawer)' => 'ক্যাশ ড্রয়ারে মোট ক্যাশ',
             ];
         }
 
@@ -280,6 +283,9 @@ class Translation extends Model
             'db.Returned to Tailor' => 'Returned to Tailor',
             'db.Total Tailor Income' => 'Total Tailor Income',
             'db.Tailor Share / Return to Tailor' => 'Tailor Share / Return to Tailor',
+            'db.Total Balance' => 'Total Balance',
+            'db.All Methods' => 'All Methods',
+            'db.Total Cash (in Drawer)' => 'Total Cash (in Drawer)',
         ];
     }
 

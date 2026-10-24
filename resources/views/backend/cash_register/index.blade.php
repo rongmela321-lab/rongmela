@@ -102,8 +102,12 @@
                                   <td id="total_expense" class="text-right"></td>
                                 </tr>
                                 <tr>
-                                  <td><strong>{{__('db.Total Cash')}}:</strong></td>
-                                  <td id="total_cash" class="text-right"></td>
+                                  <td><strong>{{__('db.Total Cash')}} ({{__('db.Total Cash (in Drawer)')}}):</strong></td>
+                                  <td id="total_cash" class="text-right font-weight-bold text-success"></td>
+                                </tr>
+                                <tr>
+                                  <td><strong>{{__('db.Total Balance')}} ({{__('db.All Methods')}}):</strong></td>
+                                  <td id="total_balance" class="text-right font-weight-bold text-info"></td>
                                 </tr>
                             </tbody>
                         </table>
@@ -157,6 +161,7 @@
               $('#register-details-modal #total_sale_return').text(data['total_sale_return']);
               $('#register-details-modal #total_expense').text(data['total_expense']);
               $('#register-details-modal #total_cash').text(data['total_cash']);
+              $('#register-details-modal #total_balance').text(data['total_balance']);
               $('#register-details-modal input[name=cash_register_id]').val(id);
           }
       });
