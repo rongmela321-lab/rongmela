@@ -19,7 +19,7 @@
     <div class="container-fluid">
         <!-- Top Summary Cards -->
         <div class="row mb-3">
-            <div class="col-xl-3 col-sm-6 mb-2">
+            <div class="col-xl col-sm-6 mb-2">
                 <div class="wrapper count-title d-flex align-items-center">
                     <div class="icon"><i class="fa fa-shopping-bag" style="color: #733686; font-size: 26px;"></i></div>
                     <div class="ml-3">
@@ -28,7 +28,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-xl-3 col-sm-6 mb-2">
+            <div class="col-xl col-sm-6 mb-2">
                 <div class="wrapper count-title d-flex align-items-center">
                     <div class="icon"><i class="fa fa-hand-holding-usd" style="color: #297ff9; font-size: 26px;"></i></div>
                     <div class="ml-3">
@@ -37,7 +37,16 @@
                     </div>
                 </div>
             </div>
-            <div class="col-xl-3 col-sm-6 mb-2">
+            <div class="col-xl col-sm-6 mb-2">
+                <div class="wrapper count-title d-flex align-items-center">
+                    <div class="icon"><i class="fa fa-user-circle" style="color: #ff9800; font-size: 26px;"></i></div>
+                    <div class="ml-3">
+                        <div class="count-number" style="color: #ff9800;">{{ number_format($total_tailor_get, 2) }}</div>
+                        <div class="name"><strong style="color: #ff9800">{{ __('db.Total Tailor Income') }}</strong></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl col-sm-6 mb-2">
                 <div class="wrapper count-title d-flex align-items-center">
                     <div class="icon"><i class="fa fa-check-circle" style="color: #00c689; font-size: 26px;"></i></div>
                     <div class="ml-3">
@@ -46,7 +55,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-xl-3 col-sm-6 mb-2">
+            <div class="col-xl col-sm-6 mb-2">
                 <div class="wrapper count-title d-flex align-items-center">
                     <div class="icon"><i class="fa fa-exclamation-triangle" style="color: #e03b3b; font-size: 26px;"></i></div>
                     <div class="ml-3">
@@ -131,6 +140,7 @@
                                 <th>{{ __('db.Delivery Amount') }}</th>
                                 <th>{{ __('db.Percentage') }}</th>
                                 <th>{{ __('db.Owner Get') }}</th>
+                                <th>{{ __('db.Tailor Share') }}</th>
                                 <th>{{ __('db.Paid Amount') }}</th>
                                 <th>{{ __('db.Due Amount') }}</th>
                                 <th>{{ __('db.Status') }}</th>
@@ -148,6 +158,7 @@
                                 <td class="font-weight-bold">{{ number_format($delivery->delivery_amount, 2) }}</td>
                                 <td><span class="badge badge-primary">{{ number_format($delivery->percentage, 2) }}%</span></td>
                                 <td class="text-primary font-weight-bold">{{ number_format($delivery->owner_get, 2) }}</td>
+                                <td class="text-info font-weight-bold">{{ number_format($delivery->delivery_amount - $delivery->owner_get, 2) }}</td>
                                 <td class="text-success font-weight-bold">{{ number_format($delivery->paid_amount, 2) }}</td>
                                 <td class="text-danger font-weight-bold">
                                     @if($delivery->due_amount > 0)
@@ -235,6 +246,7 @@
                                 <th class="text-dark">{{ number_format($total_delivery_amount, 2) }}</th>
                                 <th></th>
                                 <th class="text-primary">{{ number_format($total_owner_get, 2) }}</th>
+                                <th class="text-info">{{ number_format($total_tailor_get, 2) }}</th>
                                 <th class="text-success">{{ number_format($total_paid_amount, 2) }}</th>
                                 <th class="text-danger">{{ number_format($total_due_amount, 2) }}</th>
                                 <th colspan="3"></th>
@@ -278,14 +290,14 @@
                     </div>
 
                     <!-- Delivery Amount -->
-                    <div class="col-md-4 form-group">
+                    <div class="col-md-3 form-group">
                         <label><strong>{{ __('db.Delivery Amount') }} *</strong></label>
                         <input type="number" step="0.01" min="0" name="delivery_amount" id="add-del-amount" required class="form-control" placeholder="e.g. 1000">
                         <small class="form-text text-muted">{{ __('db.Total delivery bill amount') }}</small>
                     </div>
 
                     <!-- Percentage -->
-                    <div class="col-md-4 form-group">
+                    <div class="col-md-3 form-group">
                         <label><strong>{{ __('db.Percentage') }} *</strong></label>
                         <div class="input-group">
                             <input type="number" step="0.01" min="0" max="100" name="percentage" id="add-del-percentage" required class="form-control" placeholder="25">
@@ -297,10 +309,17 @@
                     </div>
 
                     <!-- Owner Get (Auto Calculated) -->
-                    <div class="col-md-4 form-group">
+                    <div class="col-md-3 form-group">
                         <label><strong>{{ __('db.Owner Get') }} *</strong></label>
                         <input type="number" step="0.01" min="0" name="owner_get" id="add-del-owner-get" required class="form-control font-weight-bold text-primary bg-light" placeholder="0.00">
                         <small class="form-text text-muted">{{ __('db.Total amount due to owner based on percentage') }}</small>
+                    </div>
+
+                    <!-- Tailor Share / Return to Tailor (Auto Calculated) -->
+                    <div class="col-md-3 form-group">
+                        <label><strong>{{ __('db.Tailor Share / Return to Tailor') }}</strong></label>
+                        <input type="number" step="0.01" readonly id="add-del-tailor-get" class="form-control font-weight-bold text-info bg-light" placeholder="0.00" value="0.00">
+                        <small class="form-text text-muted">{{ __('db.Returned to Tailor') }}</small>
                     </div>
 
                     <!-- Paid Amount -->
@@ -360,11 +379,11 @@
                             <label><strong>{{ __('db.Delivery Date') }} *</strong></label>
                             <input type="date" name="delivery_date" id="edit-del-date" class="form-control" required>
                         </div>
-                        <div class="col-md-4 form-group">
+                        <div class="col-md-3 form-group">
                             <label><strong>{{ __('db.Delivery Amount') }} *</strong></label>
                             <input type="number" step="0.01" min="0" name="delivery_amount" id="edit-del-amount" required class="form-control">
                         </div>
-                        <div class="col-md-4 form-group">
+                        <div class="col-md-3 form-group">
                             <label><strong>{{ __('db.Percentage') }} *</strong></label>
                             <div class="input-group">
                                 <input type="number" step="0.01" min="0" max="100" name="percentage" id="edit-del-percentage" required class="form-control">
@@ -373,9 +392,14 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-4 form-group">
+                        <div class="col-md-3 form-group">
                             <label><strong>{{ __('db.Owner Get') }} *</strong></label>
                             <input type="number" step="0.01" min="0" name="owner_get" id="edit-del-owner-get" required class="form-control font-weight-bold text-primary">
+                        </div>
+                        <div class="col-md-3 form-group">
+                            <label><strong>{{ __('db.Tailor Share / Return to Tailor') }}</strong></label>
+                            <input type="number" step="0.01" readonly id="edit-del-tailor-get" class="form-control font-weight-bold text-info bg-light">
+                            <small class="form-text text-muted">{{ __('db.Returned to Tailor') }}</small>
                         </div>
                         <div class="col-md-6 form-group">
                             <label><strong>{{ __('db.Paid Amount') }} *</strong></label>
@@ -531,7 +555,10 @@
 
         // 3. When Owner Get is manually adjusted
         $('#add-del-owner-get').on('input', function() {
+            var amount = parseFloat($('#add-del-amount').val()) || 0;
             var ownerGet = parseFloat($('#add-del-owner-get').val()) || 0;
+            var tailorGet = Math.max(0, amount - ownerGet);
+            $('#add-del-tailor-get').val(tailorGet.toFixed(2));
             var paid = parseFloat($('#add-del-paid').val()) || 0;
             var due = Math.max(0, ownerGet - paid);
             $('#add-del-due').val(due.toFixed(2));
@@ -549,7 +576,9 @@
             var amount = parseFloat($('#add-del-amount').val()) || 0;
             var percentage = parseFloat($('#add-del-percentage').val()) || 0;
             var ownerGet = (amount * percentage) / 100;
+            var tailorGet = Math.max(0, amount - ownerGet);
             $('#add-del-owner-get').val(ownerGet.toFixed(2));
+            $('#add-del-tailor-get').val(tailorGet.toFixed(2));
 
             // Default paid amount to ownerGet if user hasn't explicitly set it or wants full payment
             if (!$('#add-del-paid').data('user-changed')) {
@@ -573,9 +602,10 @@
             var id = $(this).data('id');
             var tailorId = $(this).data('tailor-id');
             var date = $(this).data('delivery-date');
-            var amount = $(this).data('delivery-amount');
+            var amount = parseFloat($(this).data('delivery-amount')) || 0;
             var percentage = $(this).data('percentage');
-            var ownerGet = $(this).data('owner-get');
+            var ownerGet = parseFloat($(this).data('owner-get')) || 0;
+            var tailorGet = Math.max(0, amount - ownerGet);
             var paid = $(this).data('paid');
             var due = $(this).data('due');
             var note = $(this).data('note');
@@ -588,6 +618,7 @@
             $('#edit-del-amount').val(amount);
             $('#edit-del-percentage').val(percentage);
             $('#edit-del-owner-get').val(ownerGet);
+            $('#edit-del-tailor-get').val(tailorGet.toFixed(2));
             $('#edit-del-paid').val(paid);
             $('#edit-del-due').val(due);
             $('#edit-del-note').val(note);
@@ -605,7 +636,10 @@
         });
 
         $('#edit-del-owner-get').on('input', function() {
+            var amount = parseFloat($('#edit-del-amount').val()) || 0;
             var ownerGet = parseFloat($('#edit-del-owner-get').val()) || 0;
+            var tailorGet = Math.max(0, amount - ownerGet);
+            $('#edit-del-tailor-get').val(tailorGet.toFixed(2));
             var paid = parseFloat($('#edit-del-paid').val()) || 0;
             var due = Math.max(0, ownerGet - paid);
             $('#edit-del-due').val(due.toFixed(2));
@@ -622,7 +656,9 @@
             var amount = parseFloat($('#edit-del-amount').val()) || 0;
             var percentage = parseFloat($('#edit-del-percentage').val()) || 0;
             var ownerGet = (amount * percentage) / 100;
+            var tailorGet = Math.max(0, amount - ownerGet);
             $('#edit-del-owner-get').val(ownerGet.toFixed(2));
+            $('#edit-del-tailor-get').val(tailorGet.toFixed(2));
 
             var paid = parseFloat($('#edit-del-paid').val()) || 0;
             var due = Math.max(0, ownerGet - paid);
@@ -696,7 +732,7 @@
             'columnDefs': [
                 {
                     "orderable": false,
-                    'targets': [0, 11]
+                    'targets': [0, 12]
                 },
                 {
                     'render': function(data, type, row, meta) {

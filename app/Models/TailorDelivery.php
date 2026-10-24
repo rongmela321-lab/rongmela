@@ -31,6 +31,11 @@ class TailorDelivery extends Model
         'due_amount' => 'float',
     ];
 
+    public function getTailorGetAttribute()
+    {
+        return max(0, (float)$this->delivery_amount - (float)$this->owner_get);
+    }
+
     public function tailor()
     {
         return $this->belongsTo(Tailor::class);

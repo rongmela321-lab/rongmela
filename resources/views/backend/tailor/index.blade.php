@@ -19,7 +19,7 @@
     <div class="container-fluid">
         <!-- Top Stats Cards -->
         <div class="row mb-3">
-            <div class="col-xl-3 col-sm-6 mb-2">
+            <div class="col-xl col-sm-6 mb-2">
                 <div class="wrapper count-title d-flex align-items-center">
                     <div class="icon"><i class="fa fa-users" style="color: #733686; font-size: 28px;"></i></div>
                     <div class="ml-3">
@@ -28,7 +28,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-xl-3 col-sm-6 mb-2">
+            <div class="col-xl col-sm-6 mb-2">
                 <div class="wrapper count-title d-flex align-items-center">
                     <div class="icon"><i class="fa fa-percent" style="color: #297ff9; font-size: 28px;"></i></div>
                     <div class="ml-3">
@@ -37,7 +37,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-xl-3 col-sm-6 mb-2">
+            <div class="col-xl col-sm-6 mb-2">
                 <div class="wrapper count-title d-flex align-items-center">
                     <div class="icon"><i class="fa fa-calendar-check-o" style="color: #17a2b8; font-size: 28px;"></i></div>
                     <div class="ml-3">
@@ -46,7 +46,16 @@
                     </div>
                 </div>
             </div>
-            <div class="col-xl-3 col-sm-6 mb-2">
+            <div class="col-xl col-sm-6 mb-2">
+                <div class="wrapper count-title d-flex align-items-center">
+                    <div class="icon"><i class="fa fa-user-circle" style="color: #ff9800; font-size: 28px;"></i></div>
+                    <div class="ml-3">
+                        <div class="count-number font-weight-bold" style="color: #ff9800 !important;">{{ number_format($total_period_tailor_income, 2) }}</div>
+                        <div class="name"><strong style="color: #ff9800">{{ __('db.Total Tailor Income') }}</strong></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xl col-sm-6 mb-2">
                 <div class="wrapper count-title d-flex align-items-center">
                     <div class="icon"><i class="fa fa-money" style="color: #00c689; font-size: 28px;"></i></div>
                     <div class="ml-3">
@@ -128,6 +137,7 @@
                                 <th>{{ __('db.Work Type') }}</th>
                                 <th>{{ __('db.Rate / Percentage') }}</th>
                                 <th>{{ __('db.Activity Count') }}</th>
+                                <th>{{ __('db.Tailor Income') }}</th>
                                 <th>{{ __('db.Total Collected') }}</th>
                                 <th>{{ __('db.Total Due') }}</th>
                                 <th>{{ __('db.Status') }}</th>
@@ -163,6 +173,26 @@
                                         <a href="{{ route('tailor_monthly_payments.index', ['tailor_id' => $tailor->id, 'starting_date' => $starting_date, 'ending_date' => $ending_date]) }}" class="badge badge-info p-2" title="{{ __('db.View Payments in this period') }}">
                                             {{ $tailor->period_monthly_payments_count ?? 0 }} {{ __('db.Payments') }}
                                         </a>
+                                    @endif
+                                </td>
+                                <td class="text-info font-weight-bold">
+                                    @if($tailor->type == 'percentage')
+                                        @php
+                                            $periodWork = (float)($tailor->period_delivery_amount ?? 0);
+                                            $periodOwnerGet = (float)($tailor->period_owner_get ?? 0);
+                                            $periodTailorIncome = max(0, $periodWork - $periodOwnerGet);
+
+                                            $allWork = (float)($tailor->all_delivery_amount ?? 0);
+                                            $allOwnerGet = (float)($tailor->all_owner_get ?? 0);
+                                            $allTailorIncome = max(0, $allWork - $allOwnerGet);
+                                        @endphp
+                                        <span>{{ number_format($periodTailorIncome, 2) }}</span>
+                                        <br><small class="text-muted font-weight-normal">{{ __('db.Total Work') }}: {{ number_format($periodWork, 2) }}</small>
+                                        @if($periodTailorIncome != $allTailorIncome)
+                                            <br><small class="text-muted font-weight-normal">{{ __('db.All Time') }}: {{ number_format($allTailorIncome, 2) }}</small>
+                                        @endif
+                                    @else
+                                        -
                                     @endif
                                 </td>
                                 <td class="text-success font-weight-bold">
@@ -503,7 +533,7 @@
             'columnDefs': [
                 {
                     "orderable": false,
-                    'targets': [0, 9]
+                    'targets': [0, 10]
                 },
                 {
                     'render': function(data, type, row, meta) {

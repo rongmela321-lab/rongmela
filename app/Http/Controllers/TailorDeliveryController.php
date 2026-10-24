@@ -34,10 +34,11 @@ class TailorDeliveryController extends Controller
         $deliveries = $query->get();
 
         // Calculate Totals
-        $total_delivery_amount = $deliveries->sum('delivery_amount');
-        $total_owner_get = $deliveries->sum('owner_get');
-        $total_paid_amount = $deliveries->sum('paid_amount');
-        $total_due_amount = $deliveries->sum('due_amount');
+        $total_delivery_amount = (float)$deliveries->sum('delivery_amount');
+        $total_owner_get = (float)$deliveries->sum('owner_get');
+        $total_tailor_get = max(0, $total_delivery_amount - $total_owner_get);
+        $total_paid_amount = (float)$deliveries->sum('paid_amount');
+        $total_due_amount = (float)$deliveries->sum('due_amount');
 
         // Only percentage tailors for dropdown
         $percentage_tailors = Tailor::where('type', 'percentage')
@@ -54,6 +55,7 @@ class TailorDeliveryController extends Controller
             'payment_status',
             'total_delivery_amount',
             'total_owner_get',
+            'total_tailor_get',
             'total_paid_amount',
             'total_due_amount'
         ));

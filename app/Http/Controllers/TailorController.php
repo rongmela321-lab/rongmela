@@ -66,6 +66,8 @@ class TailorController extends Controller
                   ->whereDate('payment_date', '<=', $ending_date);
             }
         ], 'amount')
+        ->withSum('deliveries as all_delivery_amount', 'delivery_amount')
+        ->withSum('deliveries as all_owner_get', 'owner_get')
         ->withSum('deliveries as all_delivery_paid', 'paid_amount')
         ->withSum('deliveries as all_delivery_due', 'due_amount')
         ->withSum('monthlyPayments as all_monthly_paid', 'amount')
@@ -80,6 +82,10 @@ class TailorController extends Controller
         // Summary calculations for the filtered period
         $total_period_deliveries = (int)$tailors->where('type', 'percentage')->sum('period_deliveries_count');
         $total_period_payments = (int)$tailors->where('type', 'monthly')->sum('period_monthly_payments_count');
+
+        $total_period_delivery_amount = (float)$tailors->where('type', 'percentage')->sum('period_delivery_amount');
+        $total_period_owner_get = (float)$tailors->where('type', 'percentage')->sum('period_owner_get');
+        $total_period_tailor_income = max(0, $total_period_delivery_amount - $total_period_owner_get);
 
         $total_period_delivery_paid = (float)$tailors->where('type', 'percentage')->sum('period_delivery_paid');
         $total_period_monthly_paid = (float)$tailors->where('type', 'monthly')->sum('period_monthly_paid');
@@ -97,6 +103,8 @@ class TailorController extends Controller
             'monthly_count',
             'total_period_deliveries',
             'total_period_payments',
+            'total_period_delivery_amount',
+            'total_period_tailor_income',
             'total_period_collection',
             'total_period_due'
         ));

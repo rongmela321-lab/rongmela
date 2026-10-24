@@ -157,6 +157,12 @@ class Translation extends Model
                 'db.Sold Qty' => 'বিক্রয়কৃত পরিমাণ',
                 'db.View Products' => 'পণ্যসমূহ দেখুন',
                 'db.in stock' => 'স্টকে আছে',
+                'db.Tailor Income' => 'মাস্টারের আয়',
+                'db.Tailor Share' => 'দর্জি পেল',
+                'db.Total Work' => 'মোট কাজ',
+                'db.Returned to Tailor' => 'দর্জি পেল / ফেরত',
+                'db.Total Tailor Income' => 'মাস্টারদের মোট আয়',
+                'db.Tailor Share / Return to Tailor' => 'দর্জি পেল / ফেরত',
             ];
         }
 
@@ -268,6 +274,12 @@ class Translation extends Model
             'db.Sold Qty' => 'Sold Qty',
             'db.View Products' => 'View Products',
             'db.in stock' => 'in stock',
+            'db.Tailor Income' => 'Tailor Income',
+            'db.Tailor Share' => 'Tailor Share',
+            'db.Total Work' => 'Total Work',
+            'db.Returned to Tailor' => 'Returned to Tailor',
+            'db.Total Tailor Income' => 'Total Tailor Income',
+            'db.Tailor Share / Return to Tailor' => 'Tailor Share / Return to Tailor',
         ];
     }
 
