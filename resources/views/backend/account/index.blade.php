@@ -7,6 +7,7 @@
 <section>
     <div class="container-fluid">
         <button class="btn btn-info" data-toggle="modal" data-target="#account-modal"><i class="dripicons-plus"></i> {{__('db.Add Account')}}</button>
+        <button class="btn btn-primary" data-toggle="modal" data-target="#capital-deposit-modal"><i class="dripicons-download"></i> {{__('db.Deposit Capital')}}</button>
     </div>
     <div class="table-responsive">
         <table id="account-table" class="table">
@@ -55,6 +56,7 @@
                             </button>
                             <ul class="dropdown-menu edit-options dropdown-menu-right dropdown-default" user="menu">
                                 <li><button type="button" data-id="{{$account->id}}" data-account_no="{{$account->account_no}}" data-name="{{$account->name}}"  data-initial_balance="{{$account->initial_balance}}" data-note="{{$account->note}}" class="edit-btn btn btn-link" data-toggle="modal" data-target="#editModal"><i class="dripicons-document-edit"></i> {{__('db.edit')}}</button></li>
+                                <li><button type="button" data-id="{{$account->id}}" class="deposit-btn btn btn-link" data-toggle="modal" data-target="#capital-deposit-modal"><i class="dripicons-download"></i> {{__('db.Deposit Capital')}}</button></li>
                                 <li id="account-statement-menu"><a id="account-statement" href="" class="btn btn-link"><i class="dripicons-document"></i> {{__('db.Statement')}}</a></li>
                                 <li class="divider"></li>
                                 {{ Form::open(['route' => ['accounts.destroy', $account->id], 'method' => 'DELETE'] ) }}
@@ -118,6 +120,54 @@
 </div>
 
 
+<div id="capital-deposit-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true" class="modal fade text-left">
+    <div role="document" class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 id="exampleModalLabel" class="modal-title">{{__('db.Deposit Capital')}}</h5>
+                <button type="button" data-dismiss="modal" aria-label="Close" class="close"><span aria-hidden="true"><i class="dripicons-cross"></i></span></button>
+            </div>
+            <div class="modal-body">
+              <p class="italic"><small>{{__('db.The field labels marked with * are required input fields')}}.</small></p>
+                {!! Form::open(['route' => 'capital-deposits.store', 'method' => 'post']) !!}
+                  <div class="row">
+                      <div class="col-md-6 form-group">
+                          <label>{{__('db.date')}} *</label>
+                          <input type="text" name="created_at" class="form-control date" placeholder="{{__('db.Choose date')}}" value="{{date($general_setting->date_format, strtotime('now'))}}" required />
+                      </div>
+
+                      <div class="col-md-6 form-group">
+                          <label> {{__('db.Account')}} *</label>
+                          <select class="form-control selectpicker" name="account_id" data-live-search="true" data-live-search-style="begins" title="Select account..." required>
+                          @foreach($lims_account_all as $acc)
+                              @if($acc->is_default)
+                              <option selected value="{{$acc->id}}">{{$acc->name}} [{{$acc->account_no}}]</option>
+                              @else
+                              <option value="{{$acc->id}}">{{$acc->name}} [{{$acc->account_no}}]</option>
+                              @endif
+                          @endforeach
+                          </select>
+                      </div>
+
+                      <div class="col-md-12 form-group">
+                          <label>{{__('db.Amount')}} *</label>
+                          <input type="number" name="amount" class="form-control" step="any" min="0.01" placeholder="0.00" required>
+                      </div>
+
+                      <div class="col-md-12 form-group">
+                          <label>{{__('db.Note')}}</label>
+                          <textarea name="note" rows="3" class="form-control" placeholder="মালিকের ব্যক্তিগত তহবিল জমা"></textarea>
+                      </div>
+                  </div>
+                  <div class="form-group">
+                      <button type="submit" class="btn btn-primary">{{__('db.submit')}}</button>
+                  </div>
+                {{ Form::close() }}
+            </div>
+        </div>
+    </div>
+</div>
+
 @endsection
 @push('scripts')
 <script type="text/javascript">
@@ -132,6 +182,12 @@
         $("#editModal input[name='initial_balance']").val( $(this).data('initial_balance') );
         $("#editModal input[name='account_id']").val( $(this).data('id') );
         $("#editModal textarea[name='note']").val( $(this).data('note') );
+    });
+
+    $(document).on('click', '.deposit-btn', function() {
+        var id = $(this).data('id');
+        $("#capital-deposit-modal select[name='account_id']").val(id);
+        $('.selectpicker').selectpicker('refresh');
     });
 
     $('.default').on('change', function() {

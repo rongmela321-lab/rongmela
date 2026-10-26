@@ -14,6 +14,7 @@ use App\Models\Payroll;
 use App\Models\MoneyTransfer;
 use App\Models\Purchase;
 use App\Models\Sale;
+use App\Models\CapitalDeposit;
 use DB;
 use Illuminate\Validation\Rule;
 use Spatie\Permission\Models\Role;
@@ -51,7 +52,11 @@ class AccountsController extends Controller
             $income = Income::where('account_id', $account->id)
                 ->sum('amount');
 
-            $credit = $payment_received + $return_purchase + $recieved_money_via_transfer + ($account->initial_balance ?? 0) + $income;
+            $capital_deposit = CapitalDeposit::where('account_id', $account->id)
+                ->where('type', 'deposit')
+                ->sum('amount');
+
+            $credit = $payment_received + $return_purchase + $recieved_money_via_transfer + ($account->initial_balance ?? 0) + $income + $capital_deposit;
 
             // -------------------
             // DEBIT
@@ -94,7 +99,11 @@ class AccountsController extends Controller
             $sent_money_via_transfer = MoneyTransfer::where('from_account_id', $account->id)
                 ->sum('amount');
 
-            $debit = $total_sales_return_debit + $payment_sent + $expenses + $payrolls + $sent_money_via_transfer;
+            $capital_withdraw = CapitalDeposit::where('account_id', $account->id)
+                ->where('type', 'withdraw')
+                ->sum('amount');
+
+            $debit = $total_sales_return_debit + $payment_sent + $expenses + $payrolls + $sent_money_via_transfer + $capital_withdraw;
 
             // -------------------
             // FINAL BALANCE
@@ -181,9 +190,11 @@ class AccountsController extends Controller
                 $payrolls = DB::table('payrolls')->where('account_id', $account->id)->sum('amount');
                 $sent_money_via_transfer = MoneyTransfer::where('from_account_id', $account->id)->sum('amount');
                 $recieved_money_via_transfer = MoneyTransfer::where('to_account_id', $account->id)->sum('amount');
+                $capital_deposit = CapitalDeposit::where('account_id', $account->id)->where('type', 'deposit')->sum('amount');
+                $capital_withdraw = CapitalDeposit::where('account_id', $account->id)->where('type', 'withdraw')->sum('amount');
 
-                $credit[] = $payment_recieved + $return_purchase + $recieved_money_via_transfer + $account->initial_balance;
-                $debit[] = $payment_sent + $returns + $expenses + $payrolls + $sent_money_via_transfer;
+                $credit[] = $payment_recieved + $return_purchase + $recieved_money_via_transfer + $account->initial_balance + $capital_deposit;
+                $debit[] = $payment_sent + $returns + $expenses + $payrolls + $sent_money_via_transfer + $capital_withdraw;
             }
             return view('backend.account.balance_sheet', compact('lims_account_list', 'debit', 'credit'));
         } else
@@ -246,11 +257,23 @@ class AccountsController extends Controller
                     return $item;
                 });
 
+            // Capital Deposit
+            $capital_deposits = CapitalDeposit::where('account_id', $data['account_id'])
+                ->where('type', 'deposit')
+                ->whereBetween('created_at', [$start_date, $end_date])
+                ->get()
+                ->map(function ($item) {
+                    $item->type = 'credit';
+                    $item->transaction_type = 'Capital Deposit';
+                    return $item;
+                });
+
             $account_statement_array = $account_statement_array
                 ->concat($sale_payments)
                 ->concat($money_received)
                 ->concat($purchase_return)
-                ->concat($income);
+                ->concat($income)
+                ->concat($capital_deposits);
         }
 
         // -----------------------------
@@ -295,6 +318,17 @@ class AccountsController extends Controller
                     return $item;
                 });
 
+            // Capital Withdraw
+            $capital_withdrawals = CapitalDeposit::where('account_id', $data['account_id'])
+                ->where('type', 'withdraw')
+                ->whereBetween('created_at', [$start_date, $end_date])
+                ->get()
+                ->map(function ($item) {
+                    $item->type = 'debit';
+                    $item->transaction_type = 'Capital Withdraw';
+                    return $item;
+                });
+
             // Sales Return → DEBIT calculation
             $sales_returns = Returns::with('sale')
                 ->where('account_id', $data['account_id'])
@@ -328,7 +362,8 @@ class AccountsController extends Controller
                 ->concat($expense)
                 ->concat($payroll)
                 ->concat($money_sent)
-                ->concat($sales_returns);
+                ->concat($sales_returns)
+                ->concat($capital_withdrawals);
         }
 
         // -----------------------------
@@ -353,6 +388,8 @@ class AccountsController extends Controller
                 $transaction_ref = Sale::where('id', $data->sale_id)->value('reference_no');
             } elseif (isset($data->purchase_id)) {
                 $transaction_ref = Purchase::where('id', $data->purchase_id)->value('reference_no');
+            } elseif (isset($data->transaction_type)) {
+                $transaction_ref = $data->transaction_type . (!empty($data->note) ? ' (' . $data->note . ')' : '');
             }
 
             $final_array[] = [
@@ -371,10 +408,6 @@ class AccountsController extends Controller
             'initial_balance'
         ));
     }
-
-
-
-
 
     public function destroy($id)
     {

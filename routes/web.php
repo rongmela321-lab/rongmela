@@ -69,6 +69,7 @@ use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\CustomerGroupController;
 use App\Http\Controllers\DesignationController;
 use App\Http\Controllers\MoneyTransferController;
+use App\Http\Controllers\CapitalDepositController;
 use App\Http\Controllers\IncomeCategoryController;
 use App\Http\Controllers\InvoiceSettingController;
 use App\Http\Controllers\ReturnPurchaseController;
@@ -758,6 +759,7 @@ Route::group(['middleware' => ['common', 'auth', 'active']], function () {
 
 
     Route::resource('money-transfers', MoneyTransferController::class);
+    Route::resource('capital-deposits', CapitalDepositController::class);
 
 
     //HRM routes

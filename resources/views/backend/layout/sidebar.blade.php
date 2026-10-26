@@ -199,6 +199,7 @@
                         @can('account-index')
                             <li id="account-list-menu"><a href="{{route('accounts.index')}}">{{__('db.Account List')}}</a></li>
                             <li><a id="add-account" href="">{{__('db.Add Account')}}</a></li>
+                            <li id="capital-deposit-menu"><a href="{{route('capital-deposits.index')}}">{{__('db.Capital Deposit')}}</a></li>
                         @endcan
                         @can('money-transfer')
                             <li id="money-transfer-menu"><a href="{{route('money-transfers.index')}}">{{__('db.Money Transfer')}}</a></li>

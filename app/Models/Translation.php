@@ -166,6 +166,12 @@ class Translation extends Model
                 'db.Total Balance' => 'সর্বমোট ব্যালেন্স',
                 'db.All Methods' => 'সকল মাধ্যম',
                 'db.Total Cash (in Drawer)' => 'ক্যাশ ড্রয়ারে মোট ক্যাশ',
+                'db.Capital Deposit' => 'মালিকের মূলধন জমা',
+                'db.Add Capital Deposit' => 'মূলধন জমা যোগ করুন',
+                'db.Update Capital Deposit' => 'মূলধন জমা আপডেট করুন',
+                'db.Deposit Capital' => 'মূলধন জমা',
+                'db.Capital deposited successfully' => 'মূলধন সফলভাবে জমা করা হয়েছে',
+                'db.Capital deposit updated successfully' => 'মূলধন জমা সফলভাবে আপডেট করা হয়েছে',
             ];
         }
 
@@ -286,6 +292,12 @@ class Translation extends Model
             'db.Total Balance' => 'Total Balance',
             'db.All Methods' => 'All Methods',
             'db.Total Cash (in Drawer)' => 'Total Cash (in Drawer)',
+            'db.Capital Deposit' => 'Capital Deposit',
+            'db.Add Capital Deposit' => 'Add Capital Deposit',
+            'db.Update Capital Deposit' => 'Update Capital Deposit',
+            'db.Deposit Capital' => 'Deposit Capital',
+            'db.Capital deposited successfully' => 'Capital deposited successfully',
+            'db.Capital deposit updated successfully' => 'Capital deposit updated successfully',
         ];
     }
 
