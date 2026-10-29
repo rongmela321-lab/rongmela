@@ -27,7 +27,7 @@ class AccountsController extends Controller
     public function index()
     {
         $role = Role::find(Auth::user()->role_id);
-        if (!$role->hasPermissionTo('account-index')) {
+        if (Auth::user()->role_id > 2 && (!$role || !$role->hasPermissionTo('account-index'))) {
             return redirect()->back()->with('not_permitted', __('db.Sorry! You are not allowed to access this module'));
         }
 
@@ -177,7 +177,7 @@ class AccountsController extends Controller
     public function balanceSheet()
     {
         $role = Role::find(Auth::user()->role_id);
-        if ($role->hasPermissionTo('balance-sheet')) {
+        if (Auth::user()->role_id <= 2 || ($role && $role->hasPermissionTo('balance-sheet'))) {
             $lims_account_list = Account::where('is_active', true)->get();
             $debit = [];
             $credit = [];
