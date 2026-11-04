@@ -24,10 +24,10 @@
                 @foreach($lims_money_transfer_all as $key=>$money_transfer)
                 <tr data-id="{{$money_transfer->id}}">
                     <td>{{$key}}</td>
-                    <td>{{date($general_setting->date_format, strtotime($money_transfer->created_at->toDateString())) . ' '. $money_transfer->created_at->toTimeString() }}</td>
+                    <td data-sort="{{ $money_transfer->created_at }}">{{date($general_setting->date_format, strtotime($money_transfer->created_at->toDateString())) . ' '. $money_transfer->created_at->toTimeString() }}</td>
                     <td>{{ $money_transfer->reference_no }}</td>
-                    <td>{{ $money_transfer->fromAccount->name }}</td>
-                    <td>{{ $money_transfer->toAccount->name }}</td>
+                    <td>{{ $money_transfer->fromAccount ? $money_transfer->fromAccount->name : 'N/A' }}</td>
+                    <td>{{ $money_transfer->toAccount ? $money_transfer->toAccount->name : 'N/A' }}</td>
                     <td>{{ number_format((float)$money_transfer->amount, $general_setting->decimal, '.', '')}}</td>
                     <td>
                         <div class="btn-group">
@@ -75,6 +75,14 @@
                 {!! Form::open(['route' => 'money-transfers.store', 'method' => 'post']) !!}
                   <div class="row">
                       <div class="col-md-6 form-group">
+                          <label>{{__('db.date')}}</label>
+                          <input type="text" name="created_at" class="form-control date" placeholder="{{__('db.Choose date')}}" value="{{date($general_setting->date_format, strtotime('now'))}}"/>
+                      </div>
+                      <div class="col-md-6 form-group">
+                          <label>{{__('db.Amount')}} *</label>
+                          <input type="number" name="amount" class="form-control" step="any" required>
+                      </div>
+                      <div class="col-md-6 form-group">
                           <label> {{__('db.From Account')}} *</label>
                           <select class="form-control selectpicker" name="from_account_id" data-live-search="true" data-live-search-style="begins" title="Select from account..." required>
                           @foreach($lims_account_list as $account)
@@ -89,11 +97,6 @@
                               <option value="{{$account->id}}">{{$account->name}} [{{$account->account_no}}]</option>
                           @endforeach
                           </select>
-                      </div>
-
-                      <div class="col-md-6 form-group">
-                          <label>{{__('db.Amount')}} *</label>
-                          <input type="number" name="amount" class="form-control" step="any" required>
                       </div>
                   </div>
                   <div class="form-group">
@@ -122,7 +125,10 @@
                             <label>{{__('db.date')}}</label>
                             <input type="text" name="created_at" class="form-control date" placeholder="{{__('db.Choose date')}}"/>
                         </div>
-
+                      <div class="col-md-6 form-group">
+                          <label>{{__('db.Amount')}} *</label>
+                          <input type="number" name="amount" class="form-control" step="any" required>
+                      </div>
                       <div class="col-md-6 form-group">
                           <label> {{__('db.From Account')}} *</label>
                           <select class="form-control selectpicker" name="from_account_id" data-live-search="true" data-live-search-style="begins" title="Select from account..." required>
@@ -139,11 +145,6 @@
                           @endforeach
                           </select>
                       </div>
-
-                      <div class="col-md-6 form-group">
-                          <label>{{__('db.Amount')}} *</label>
-                          <input type="number" name="amount" class="form-control" step="any" required>
-                      </div>
                   </div>
                   <div class="form-group">
                       <button type="submit" class="btn btn-primary">{{__('db.submit')}}</button>
@@ -153,8 +154,6 @@
         </div>
     </div>
 </div>
-
-
 
 @endsection
 
@@ -167,7 +166,6 @@
 
     var money_transfer_id = [];
     var user_verified = <?php echo json_encode(env('USER_VERIFIED')) ?>;
-
 
     $.ajaxSetup({
         headers: {
@@ -334,9 +332,6 @@
             $( dt_selector.column( 5 ).footer() ).html(dt_selector.cells( rows, 5, { page: 'current' } ).data().sum().toFixed({{$general_setting->decimal}}));
         }
     }
-
-    /*if(all_permission.indexOf("money_transfers-delete") == -1)
-        $('.buttons-delete').addClass('d-none');*/
 
 </script>
 @endpush
