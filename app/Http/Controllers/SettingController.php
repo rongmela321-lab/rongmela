@@ -26,6 +26,8 @@ use Clickatell\ClickatellException;
 use Spatie\Permission\Models\Role;
 use Auth;
 use Mail;
+use App\Models\WhatsappSetting;
+use Illuminate\Support\Facades\Schema;
 
 class SettingController extends Controller
 {
@@ -694,6 +696,13 @@ class SettingController extends Controller
     }
     public function posSetting()
     {
+        if (!Schema::hasColumn('pos_setting', 'send_whatsapp')) {
+            Schema::table('pos_setting', function ($table) {
+                $table->boolean('send_whatsapp')->default(0);
+                $table->string('whatsapp_template')->nullable();
+            });
+        }
+
         $lims_customer_list = Customer::where('is_active', true)->get();
         $lims_warehouse_list = Warehouse::where('is_active', true)->get();
         $lims_biller_list = Biller::where('is_active', true)->get();
@@ -704,7 +713,25 @@ class SettingController extends Controller
         else
             $options = [];
 
-        return view('backend.setting.pos_setting', compact('lims_customer_list', 'lims_warehouse_list', 'lims_biller_list', 'lims_pos_setting_data','options'));
+        // WhatsApp Templates
+        $whatsapp_setting = WhatsappSetting::first();
+        $whatsapp_templates = [];
+        if ($whatsapp_setting && !empty($whatsapp_setting->business_account_id) && !empty($whatsapp_setting->permanent_access_token)) {
+            $templatesData = $whatsapp_setting->getTemplates();
+            if (is_array($templatesData) && !isset($templatesData['error'])) {
+                $whatsapp_templates = $templatesData;
+            }
+        }
+
+        return view('backend.setting.pos_setting', compact(
+            'lims_customer_list',
+            'lims_warehouse_list',
+            'lims_biller_list',
+            'lims_pos_setting_data',
+            'options',
+            'whatsapp_setting',
+            'whatsapp_templates'
+        ));
     }
 
     public function posSettingStore(Request $request)
@@ -749,6 +776,13 @@ class SettingController extends Controller
             $pos_setting->send_sms = false;
         else
             $pos_setting->send_sms = true;
+
+        if(!isset($data['send_whatsapp']))
+            $pos_setting->send_whatsapp = false;
+        else
+            $pos_setting->send_whatsapp = true;
+
+        $pos_setting->whatsapp_template = $data['whatsapp_template'] ?? null;
 
         if(!isset($data['cash_register']))
             $pos_setting->cash_register = false;

@@ -1328,6 +1328,116 @@ class SaleController extends Controller
         }
         //sms send end
 
+        // whatsapp send start
+        try {
+            if(!empty($lims_pos_setting_data['send_whatsapp']) && !empty($lims_pos_setting_data['whatsapp_template'])) {
+                $customer = Customer::find($data['customer_id']);
+                $customerPhone = $customer ? ($customer->wa_number ?? $customer->phone_number) : null;
+                if ($customerPhone) {
+                    $whSetting = WhatsappSetting::first();
+                    if ($whSetting && !empty($whSetting->phone_number_id) && !empty($whSetting->permanent_access_token)) {
+                        if (str_contains($lims_pos_setting_data['whatsapp_template'], '|')) {
+                            list($tplName, $tplLang) = explode('|', $lims_pos_setting_data['whatsapp_template']);
+                            
+                            $msgContent = [
+                                'name' => $tplName,
+                                'lang_code' => $tplLang,
+                            ];
+
+                            // Check if template requires dynamic parameters (e.g. {{1}}, {{2}})
+                            $templates = $whSetting->getTemplates();
+                            if (is_array($templates)) {
+                                foreach ($templates as $t) {
+                                    if (($t['name'] ?? '') === $tplName) {
+                                        if (isset($t['components'])) {
+                                            foreach ($t['components'] as $comp) {
+                                                if (($comp['type'] ?? '') === 'BODY' && isset($comp['text'])) {
+                                                    preg_match_all('/\{\{(\d+)\}\}/', $comp['text'], $matches);
+                                                    $paramCount = !empty($matches[1]) ? max(array_map('intval', $matches[1])) : 0;
+                                                    if ($paramCount > 0) {
+                                                        $custName = (string)($customer->name ?? 'Customer');
+                                                        $refNo = (string)($lims_sale_data->reference_no ?? ($data['reference_no'] ?? ''));
+                                                        $saleDate = !empty($lims_sale_data->created_at) ? date('d-m-Y', strtotime($lims_sale_data->created_at)) : date('d-m-Y');
+                                                        $totalPrice = number_format((float)($lims_sale_data->total_price ?? ($lims_sale_data->grand_total + ($lims_sale_data->order_discount ?? 0))), 2, '.', '');
+                                                        $discount = number_format((float)($lims_sale_data->order_discount ?? 0), 2, '.', '');
+                                                        $grandTotal = number_format((float)($lims_sale_data->grand_total ?? 0), 2, '.', '');
+                                                        $paidAmount = number_format((float)($lims_sale_data->paid_amount ?? $grandTotal), 2, '.', '');
+
+                                                        if ($paramCount == 6) {
+                                                            $availableValues = [
+                                                                1 => $custName,
+                                                                2 => $refNo,
+                                                                3 => $saleDate,
+                                                                4 => $totalPrice,
+                                                                5 => $discount,
+                                                                6 => $grandTotal,
+                                                            ];
+                                                        } elseif ($paramCount == 5) {
+                                                            $availableValues = [
+                                                                1 => $custName,
+                                                                2 => $refNo,
+                                                                3 => $totalPrice,
+                                                                4 => $discount,
+                                                                5 => $grandTotal,
+                                                            ];
+                                                        } elseif ($paramCount == 4) {
+                                                            $availableValues = [
+                                                                1 => $custName,
+                                                                2 => $refNo,
+                                                                3 => $grandTotal,
+                                                                4 => $paidAmount,
+                                                            ];
+                                                        } elseif ($paramCount == 3) {
+                                                            $availableValues = [
+                                                                1 => $custName,
+                                                                2 => $refNo,
+                                                                3 => $grandTotal,
+                                                            ];
+                                                        } else {
+                                                            $availableValues = [
+                                                                1 => $custName,
+                                                                2 => $refNo,
+                                                                3 => $saleDate,
+                                                                4 => $totalPrice,
+                                                                5 => $discount,
+                                                                6 => $grandTotal,
+                                                                7 => $paidAmount,
+                                                            ];
+                                                        }
+
+                                                        $params = [];
+                                                        for ($i = 1; $i <= $paramCount; $i++) {
+                                                            $params[] = [
+                                                                'type' => 'text',
+                                                                'text' => (string)($availableValues[$i] ?? ('Val ' . $i)),
+                                                            ];
+                                                        }
+                                                        $msgContent['components'] = [
+                                                            [
+                                                                'type' => 'body',
+                                                                'parameters' => $params,
+                                                            ]
+                                                        ];
+                                                    }
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                        break;
+                                    }
+                                }
+                            }
+
+                            $whSetting->sendMessage([$customerPhone], 'template', $msgContent);
+                        }
+                    }
+                }
+            }
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Auto WhatsApp sale send error: ' . $e->getMessage());
+        }
+        // whatsapp send end
+
         //api calling code
         if (request()->ajax()) {
 
@@ -1472,7 +1582,6 @@ class SaleController extends Controller
             $this->_smsModel->initialize($data);
             return redirect()->back();
         }
-        //sms send end
         else {
             return redirect()->back()->with('not_permitted', __('db.Please setup your SMS API first!'));
         }

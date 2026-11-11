@@ -37,6 +37,9 @@ class WhatsappSetting extends Model
                         'name' => $messageContent['name'],
                         'language' => ['code' => $messageContent['lang_code']],
                 ];
+                if (!empty($messageContent['components'])) {
+                    $payload['template']['components'] = $messageContent['components'];
+                }
             }
             // Text message
             elseif ($type == 'text') {
@@ -91,19 +94,46 @@ class WhatsappSetting extends Model
             $results = [];// Store response per number for debug purpose
 
             // Loop through all numbers
+            $hasError = false;
+            $lastErrorMessage = '';
+
             foreach ($phoneNumbers as $phoneNumber) {
-                $payload['to'] = $phoneNumber;
-                // Dispatch to queue for async send
-                dispatch(function () use ($headers, $messageEndpoint, $payload, $phoneNumber, &$results) {
-                    // Send message request
-                    $response = Http::withOptions(['verify' => false])
+                // Ensure international format (e.g. Bangladesh: 017... -> 88017...)
+                $cleanPhone = preg_replace('/\D/', '', $phoneNumber);
+                if (strlen($cleanPhone) === 11 && str_starts_with($cleanPhone, '01')) {
+                    $cleanPhone = '88' . $cleanPhone;
+                }
+                $payload['to'] = $cleanPhone;
+
+                // Send message request
+                $response = Http::withOptions(['verify' => false])
                     ->withHeaders($headers)
                     ->post($messageEndpoint, $payload);
 
-                    // Store response per number for debug purpose
-                    $results[$phoneNumber] = $response->json();
-                });
+                \Illuminate\Support\Facades\Log::info('WhatsApp sendMessage response', [
+                    'to' => $cleanPhone,
+                    'endpoint' => $messageEndpoint,
+                    'payload' => $payload,
+                    'status' => $response->status(),
+                    'response' => $response->json() ?? $response->body()
+                ]);
+
+                if (!$response->successful()) {
+                    $hasError = true;
+                    $errorData = $response->json('error');
+                    $lastErrorMessage = $errorData['message'] ?? $response->body();
+                }
+
+                $results[$cleanPhone] = $response->json();
             }
+
+            if ($hasError) {
+                return [
+                    'success' => false,
+                    'message' => $lastErrorMessage,
+                ];
+            }
+
             return [
                 'success' => true,
                 'message' => __('db.message_sent_successfully'),
@@ -120,35 +150,75 @@ class WhatsappSetting extends Model
     // 🔹 Get templates from Facebook
     public function getTemplates()
     {
-        $url = "{$this->baseUrl}/{$this->business_account_id}/message_templates";
-        $headers = ['Authorization' => "Bearer {$this->permanent_access_token}"];
+        try {
+            $phoneCheck = Http::withOptions(['verify' => false])
+                ->withHeaders(['Authorization' => "Bearer {$this->permanent_access_token}"])
+                ->get("{$this->baseUrl}/{$this->phone_number_id}?fields=id,display_phone_number,whatsapp_business_account");
+            \Illuminate\Support\Facades\Log::info('Phone Number Info from Meta', [
+                'phone_id' => $this->phone_number_id,
+                'business_account_id_in_db' => $this->business_account_id,
+                'response' => $phoneCheck->json()
+            ]);
 
-        $response = Http::withOptions(['verify' => false])->withHeaders($headers)->get($url);
+            $url = "{$this->baseUrl}/{$this->business_account_id}/message_templates";
+            $headers = ['Authorization' => "Bearer {$this->permanent_access_token}"];
 
-        if ($response->successful()) {
-            return $response->json('data');
+            $response = Http::withOptions(['verify' => false])->withHeaders($headers)->get($url);
+
+            if ($response->successful()) {
+                $data = $response->json('data') ?? [];
+                foreach ($data as $t) {
+                    if (($t['name'] ?? '') === 'rongmela_invoice') {
+                        \Illuminate\Support\Facades\Log::info('Full rongmela_invoice template object', $t);
+                    }
+                }
+                return $data;
+            }
+
+            \Illuminate\Support\Facades\Log::error('WhatsApp templates fetch error', [
+                'status' => $response->status(),
+                'body' => $response->json() ?? $response->body()
+            ]);
+
+            $errorMsg = $response->json('error.message') ?? __('db.failed_to_fetch_templates');
+            return ['error' => $errorMsg];
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('WhatsApp templates exception: ' . $e->getMessage());
+            return ['error' => $e->getMessage()];
         }
-
-        return ['error' => __('db.failed_to_fetch_templates')];
     }
 
     // 🔹 Delete template from Facebook
     public function deleteTemplate(string $name)
     {
-        $url = "{$this->baseUrl}/{$this->business_account_id}/message_templates?name={$name}";
-        $headers = ['Authorization' => "Bearer {$this->permanent_access_token}"];
+        try {
+            $url = "{$this->baseUrl}/{$this->business_account_id}/message_templates?name={$name}";
+            $headers = ['Authorization' => "Bearer {$this->permanent_access_token}"];
 
-        $response = Http::withOptions(['verify' => false])->withHeaders($headers)->delete($url);
+            $response = Http::withOptions(['verify' => false])->withHeaders($headers)->delete($url);
 
-        if ($response->successful()) {
-            return ['success' => true, 'message' => __('db.template_deleted_successfully')];
+            if ($response->successful()) {
+                return ['success' => true, 'message' => __('db.template_deleted_successfully')];
+            }
+
+            \Illuminate\Support\Facades\Log::error('WhatsApp deleteTemplate error', [
+                'name' => $name,
+                'status' => $response->status(),
+                'body' => $response->json() ?? $response->body()
+            ]);
+
+            return [
+                'success' => false,
+                'message' => $response->json('error.message') ?? __('db.failed_delete_template'),
+                'response' => $response->json(),
+            ];
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('WhatsApp deleteTemplate exception: ' . $e->getMessage());
+            return [
+                'success' => false,
+                'message' => $e->getMessage(),
+            ];
         }
-
-        return [
-            'success' => false,
-            'message' => __('db.failed_delete_template'),
-            'response' => $response->json(),
-        ];
     }
 
 }

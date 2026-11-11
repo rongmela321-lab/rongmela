@@ -102,6 +102,34 @@
                                     @endif
                                     <label class="mt-2">{{__('db.print_invoice')}} <x-info title="If unchecked invoice will not print after sales" type="info" /></label>
                                 </div>
+                                <div class="col-md-3 mt-2 mb-2">
+                                    @if($lims_pos_setting_data && $lims_pos_setting_data->send_whatsapp)
+                                    <input class="mt-2" type="checkbox" name="send_whatsapp" id="send_whatsapp" value="1" checked>
+                                    @else
+                                    <input class="mt-2" type="checkbox" name="send_whatsapp" id="send_whatsapp" value="1">
+                                    @endif
+                                    <label class="mt-2">{{__('db.Send WhatsApp After Sale') ?? 'Send WhatsApp After Sale'}} <x-info title="If enabled, automated WhatsApp message will be sent to customer after sale" type="info" /></label>
+                                </div>
+                                <div class="col-md-3 mt-2 mb-2" id="whatsapp_template_section" style="{{ ($lims_pos_setting_data && $lims_pos_setting_data->send_whatsapp) ? '' : 'display:none;' }}">
+                                    <label>{{__('db.Default WhatsApp Template') ?? 'Default WhatsApp Template'}}</label>
+                                    <select name="whatsapp_template" class="selectpicker form-control" data-live-search="true" title="Select template...">
+                                        @foreach($whatsapp_templates as $tpl)
+                                            @php
+                                                $isSample = ($tpl['name'] == 'hello_world' || str_starts_with($tpl['name'], 'jaspers_'));
+                                                $status = $tpl['status'] ?? '';
+                                                $label = $tpl['name'] . ' (' . $tpl['language'] . ')';
+                                                if ($isSample) {
+                                                    $label .= ' [Meta Test Only]';
+                                                } else {
+                                                    $label .= ' [' . $status . ']';
+                                                }
+                                            @endphp
+                                            <option value="{{ $tpl['name'] }}|{{ $tpl['language'] }}" {{ ($lims_pos_setting_data && $lims_pos_setting_data->whatsapp_template == $tpl['name'].'|'.$tpl['language']) ? 'selected' : '' }}>
+                                                {{ $label }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
                             </div>
                             <hr>
                             <div class="row">
@@ -262,6 +290,14 @@
             $('#collapseThermal').addClass('show');
         } else {
             $('#collapseThermal').removeClass('show');
+        }
+    });
+
+    $('#send_whatsapp').on('change', function(){
+        if($(this).is(':checked')){
+            $('#whatsapp_template_section').slideDown(200);
+        } else {
+            $('#whatsapp_template_section').slideUp(200);
         }
     });
 
