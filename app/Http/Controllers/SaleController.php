@@ -1330,12 +1330,16 @@ class SaleController extends Controller
 
         // whatsapp send start
         try {
-            if(!empty($lims_pos_setting_data['send_whatsapp']) && !empty($lims_pos_setting_data['whatsapp_template'])) {
-                $customer = Customer::find($data['customer_id']);
-                $customerPhone = $customer ? ($customer->wa_number ?? $customer->phone_number) : null;
-                if ($customerPhone) {
-                    $whSetting = WhatsappSetting::first();
-                    if ($whSetting && !empty($whSetting->phone_number_id) && !empty($whSetting->permanent_access_token)) {
+            $customer = Customer::find($data['customer_id']);
+            $customerPhone = $this->getValidCustomerWhatsappNumber($customer);
+
+            // ONLY proceed if customer has a valid WhatsApp number explicitly set!
+            if (!empty($customerPhone)) {
+                $whSetting = WhatsappSetting::first();
+                if ($whSetting && !empty($whSetting->phone_number_id) && !empty($whSetting->permanent_access_token)) {
+
+                    // Mode 1: Template Message (When POS Setting's "Send WhatsApp After Sale" IS checked with a template)
+                    if (!empty($lims_pos_setting_data['send_whatsapp']) && !empty($lims_pos_setting_data['whatsapp_template'])) {
                         if (str_contains($lims_pos_setting_data['whatsapp_template'], '|')) {
                             list($tplName, $tplLang) = explode('|', $lims_pos_setting_data['whatsapp_template']);
                             
@@ -1431,7 +1435,27 @@ class SaleController extends Controller
                             $whSetting->sendMessage([$customerPhone], 'template', $msgContent);
                         }
                     }
+                    // Mode 2: Auto Invoice PDF (When POS Setting is NOT checked, BUT on POS sale checkout "send_whatsapp" IS checked)
+                    elseif (!empty($data['send_whatsapp'])) {
+                        $view = $this->genInvoice($lims_sale_data->id);
+                        $htmlContent = $view->render();
+
+                        $whRequest = new Request([
+                            'receiver_phone' => [$customerPhone],
+                            'html_content' => $htmlContent,
+                            'message' => 'Invoice',
+                        ]);
+
+                        $whpcon = new \App\Http\Controllers\WhatsappController();
+                        $whpcon->sendMessage($whRequest);
+                    }
                 }
+            } else {
+                \Illuminate\Support\Facades\Log::info('WhatsApp send skipped: Customer has no valid WhatsApp number set.', [
+                    'customer_id' => $data['customer_id'] ?? null,
+                    'customer_name' => $customer->name ?? null,
+                    'wa_number' => $customer->wa_number ?? null,
+                ]);
             }
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::error('Auto WhatsApp sale send error: ' . $e->getMessage());
@@ -1473,6 +1497,49 @@ class SaleController extends Controller
             return redirect('sales')->with('message', $message);
         }
 
+    }
+
+    /**
+     * Validate and normalize a customer's WhatsApp number.
+     * Returns sanitized international number (e.g. 8801684067842) if valid, or null if empty/invalid.
+     */
+    private function getValidCustomerWhatsappNumber($customer)
+    {
+        if (!$customer) {
+            return null;
+        }
+
+        // WhatsApp number must be explicitly set
+        $rawNumber = trim($customer->wa_number ?? '');
+        if (empty($rawNumber) || strtolower($rawNumber) === 'null' || strtolower($rawNumber) === 'n/a') {
+            return null;
+        }
+
+        // Remove all non-digits
+        $digits = preg_replace('/\D/', '', $rawNumber);
+
+        // Bangladesh format 1: 013XXXXXXXX to 019XXXXXXXX (11 digits)
+        if (preg_match('/^01[3-9]\d{8}$/', $digits)) {
+            return '88' . $digits;
+        }
+
+        // Bangladesh format 2: 88013XXXXXXXX to 88019XXXXXXXX (13 digits)
+        if (preg_match('/^8801[3-9]\d{8}$/', $digits)) {
+            return $digits;
+        }
+
+        // Valid international format (10 to 15 digits)
+        if (preg_match('/^[1-9]\d{9,14}$/', $digits)) {
+            if (str_starts_with($digits, '88') && !preg_match('/^8801[3-9]\d{8}$/', $digits)) {
+                return null;
+            }
+            if (str_starts_with($digits, '822')) {
+                return null;
+            }
+            return $digits;
+        }
+
+        return null;
     }
 
     private function generateInvoiceName($default){

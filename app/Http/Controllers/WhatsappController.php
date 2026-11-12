@@ -201,6 +201,25 @@ class WhatsappController extends Controller
 
         $result = $settings->sendMessage($phoneNumbers, $type, $messageContent);
 
+        // 🟢 Delete temporary PDF immediately after uploading to WhatsApp to save 100% disk space
+        if (isset($tempPath) && file_exists($tempPath)) {
+            @unlink($tempPath);
+        }
+
+        // 🟢 Auto clean any leftover temporary PDF files
+        try {
+            $oldPdfs = glob(storage_path('app/temp_file_*.pdf'));
+            if ($oldPdfs) {
+                foreach ($oldPdfs as $oldFile) {
+                    if (is_file($oldFile) && (time() - filemtime($oldFile)) > 120) {
+                        @unlink($oldFile);
+                    }
+                }
+            }
+        } catch (\Exception $e) {
+            // Ignore background cleanup errors
+        }
+
         if ($request->has('_from_form')) {
             // 6️⃣ Response
             if ($result['success'] ?? false) {
